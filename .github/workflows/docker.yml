@@ -1,5 +1,7 @@
+---
 name: Create and publish a Docker image
 
+# yamllint disable-line rule:truthy
 on:
   push:
     tags: ["*"]
@@ -35,7 +37,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: woensugchoi/template
+          images: woensugchoi/dave
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}

@@ -11,7 +11,7 @@
 #     pre-commit autoupdate
 #
 # See https://github.com/pre-commit/pre-commit
-
+---
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -95,7 +95,8 @@ repos:
         language: system
         files: CMakeLists\.txt$
 
-  # # Copyright (exclude for now, doesn't exist for nobel https://packages.ubuntu.com/search?keywords=ament+copyright&searchon=names)
+  # Copyright (exclude for now, doesn't exist for nobel
+  # https://packages.ubuntu.com/search?keywords=ament+copyright&searchon=names)
   # - repo: local
   #   hooks:
   #     - id: ament_copyright
@@ -130,6 +131,7 @@ repos:
         args: ["--write-changes", "--uri-ignore-words-list=ist", "-L manuel"]
         exclude: CHANGELOG\.rst|\.(svg|pyc|drawio)$
 
+  # Json lint
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.28.2
     hooks:
@@ -139,3 +141,14 @@ repos:
         args: ["--verbose"]
       - id: check-dependabot
         args: ["--verbose"]
+
+  # XML lint for xacro, urdf, and sdf files
+  - repo: local
+    hooks:
+      - id: xml-lint-robot-files
+        name: xml-lint-robot-files
+        description: Lint XML syntax in xacro, urdf, and sdf files.
+        entry: xmllint --noout
+        language: system
+        types: [text]
+        files: \.(xacro|urdf|sdf|xml|launch)$

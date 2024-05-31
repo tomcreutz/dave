@@ -1,4 +1,7 @@
+---
 name: Jazzy Source Build
+
+# yamllint disable-line rule:truthy
 on:
   workflow_dispatch:
   push:
@@ -37,7 +40,8 @@ jobs:
         run: |
           command -v sudo >/dev/null 2>&1 || (apt update && apt install -y sudo)
           DEBIAN_FRONTEND=noninteractive sudo apt update && sudo apt upgrade -y
-          echo "need_node=$(command -v node >/dev/null 2>&1 && echo 0 || echo 1)" >> $GITHUB_OUTPUT
+          echo "need_node=$(command -v node >/dev/null 2>&1 && echo 0 || echo 1)"
+          >> $GITHUB_OUTPUT
 
       # needed for github actions, and only if a bare ubuntu image is used
       - uses: actions/setup-node@v4
@@ -70,7 +74,8 @@ jobs:
           vcs-repo-file-url: |
             https://raw.githubusercontent.com/ros2/ros2/${{ env.ref }}/ros2.repos
             ${{ env.path }}/extras/repos/dave.${{ env.ros_distro }}.repos
-          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+          colcon-mixin-repository:
+            https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
       - uses: actions/upload-artifact@v4.3.3
         with:
           name: colcon-logs-${{ env.os_name }}-${{ env.ros_distro }}
