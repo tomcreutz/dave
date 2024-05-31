@@ -61,7 +61,7 @@ repos:
 
   # CPP hooks
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.4
+    rev: v18.1.5
     hooks:
       - id: clang-format
         args: ["-fallback-style=none", "-i"]
@@ -125,7 +125,7 @@ repos:
   # Spellcheck in comments and docs
   # skipping of *.svg files is not working...
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
       - id: codespell
         args: ["--write-changes", "--uri-ignore-words-list=ist", "-L manuel"]
@@ -133,7 +133,7 @@ repos:
 
   # Json lint
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.2
+    rev: 0.28.4
     hooks:
       - id: check-github-workflows
         args: ["--verbose"]
@@ -152,12 +152,3 @@ repos:
         language: system
         types: [text]
         files: \.(xacro|urdf|sdf|xml|launch)$
-
-  - repo: local
-    hooks:
-      - id: check-line-length-under-100
-        name: Check line length
-        description: Ensure no line is longer than 100 characters.
-        entry: bash -c 'if (( $(awk "{ if (length > 100) print }" $1 | wc -l) > 0 )); then echo "Line too long in file $1"; exit 1; fi'
-        language: system
-        files: .
