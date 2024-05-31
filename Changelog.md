@@ -75,14 +75,14 @@ This changelog covers the entire dave project which includes a few repositories,
 ### Update
 - Official Ubuntu Focal (20.04) - Noetic - Gazebo 11 Support
   - VCS support : [dave PR #137](https://github.com/Field-Robotics-Lab/dave/pull/137)
-  - Compatability to Noetic and Melodic
-- Remove legcy Image sonar and GPS inhereted from UUV Simulator : [dave PR #94](https://github.com/Field-Robotics-Lab/dave/pull/94)
+  - Compatibility to Noetic and Melodic
+- Remove legcy Image sonar and GPS inherited from UUV Simulator : [dave PR #94](https://github.com/Field-Robotics-Lab/dave/pull/94)
 - Ocean current plugin
   - Relative path for stratified/transient ocean current databasefile path : [dave PR #95](https://github.com/Field-Robotics-Lab/dave/pull/95)
   - ROS topic format updated to Vector3 and reorganized cross-dependency between model/world plugin source codes : [dave PR #86](https://github.com/Field-Robotics-Lab/dave/issues/86) and [dave PR #100](https://github.com/Field-Robotics-Lab/dave/pull/100)
   - Multiple vehicle support : [dave PR #101](https://github.com/Field-Robotics-Lab/dave/pull/101)
   - Tidal Oscillation support : [dave PR #102](https://github.com/Field-Robotics-Lab/dave/pull/102)
-  - Fix sudden jump at databse interpolation : [dave PR #106](https://github.com/Field-Robotics-Lab/dave/pull/106)
+  - Fix sudden jump at database interpolation : [dave PR #106](https://github.com/Field-Robotics-Lab/dave/pull/106)
 - Predator arm
   - texture fix : [dave PR #99](https://github.com/Field-Robotics-Lab/dave/pull/99)
   - Change joint name : [dave PR #112](https://github.com/Field-Robotics-Lab/dave/pull/112)
@@ -134,13 +134,13 @@ This changelog covers the entire dave project which includes a few repositories,
   - Multibeam Sonar URDF for standalone and robot description [Multibeam Sonar PR #38](https://github.com/Field-Robotics-Lab/nps_uw_multibeam_sonar/pull/38)
    - Documentation and tutorial for the local search scenario demonstration with GPURay-based multibeam sonar [wiki](https://github.com/Field-Robotics-Lab/dave/wiki/Multibeam-Forward-Looking-Sonar#degradaded-object-detection-scenarios)
    - Documentation and tutorial for the degraded object detection scenarios with distorted mesh models [wiki](https://github.com/Field-Robotics-Lab/dave/wiki/Multibeam-Forward-Looking-Sonar#degradaded-object-detection-scenarios) and [Multibeam Sonar PR #33](https://github.com/Field-Robotics-Lab/nps_uw_multibeam_sonar/pull/33)
-   
+
 - Bathymetry Converter
-  - Docker image distribution including neccesary libraries and excutables [Docker Hub image](https://hub.docker.com/r/woensugchoi/bathymetry_converter)
+  - Docker image distribution including necessary libraries and executables [Docker Hub image](https://hub.docker.com/r/woensugchoi/bathymetry_converter)
   - Redesign of the automatic tile generator with python language [mkbathy.py](https://github.com/Field-Robotics-Lab/Bathymetry_Converter/blob/a6fa5ba1549e15a17eb7869f6103e907b9f4394a/mkbathy.py)
   - Automatic color texture generation with bathymetry depth
 
-- Demonstration of Importing Bathymetric Maps 
+- Demonstration of Importing Bathymetric Maps
   - [Bathymetry Models Wiki](https://github.com/Field-Robotics-Lab/dave/wiki/Bathymetry-Models)
 
 - Mud Plugin
@@ -151,7 +151,7 @@ This changelog covers the entire dave project which includes a few repositories,
   - Creation of MoveIt-based infrastructure for motion planning with single and multi-arm systems. [uuv_manipulators PR #8](https://github.com/Field-Robotics-Lab/uuv_manipulators/pull/8)
   - Addition and configuration of multiple arms onboard arbitrary robot. [dave PR #206](https://github.com/Field-Robotics-Lab/dave/pull/206)
   - Demonstration of bimanual manipulation scenarios using joy teleop, RViz interaction, and MoveIt ROS nodes. [dave PR #228](https://github.com/Field-Robotics-Lab/dave/pull/228)
-  - Documentation and tutorial [wiki](https://github.com/Field-Robotics-Lab/dave/wiki/Bimanual-Manipulation-Setup-and-Examples) 
+  - Documentation and tutorial [wiki](https://github.com/Field-Robotics-Lab/dave/wiki/Bimanual-Manipulation-Setup-and-Examples)
 
 - Mating Plugin
   - Expose mating forces for mating plugin as ROS publication [dave PR #189](https://github.com/Field-Robotics-Lab/dave/pull/189)

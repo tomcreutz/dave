@@ -9,7 +9,7 @@ You can pull a prebuilt image with this docker tag: `ghcr.io/ros-controls/dave_s
 
 To build and run the container, execute the following code in a terminal:
 ```
-docker build --tag dave:source --file .docker/Dockerfile .
+docker build --tag dave:source --file .docker/jazzy.dockerfile .
 docker run -it dave:source
 ```
 

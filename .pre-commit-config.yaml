@@ -158,4 +158,5 @@ repos:
     rev: v3.5.0  # You may version pin this if desired
     hooks:
     - id: docker-lint
+      files: \.dockerfile
     - id: docker-compose-lint
