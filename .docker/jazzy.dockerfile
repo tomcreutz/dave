@@ -6,7 +6,7 @@ ENV ROS_UNDERLAY /root/ws_dave/install
 WORKDIR $ROS_UNDERLAY/../src
 
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-    extras/repos/dave.$ROS_DISTRO.repos dave.repos
+extras/repos/dave.$ROS_DISTRO.repos dave.repos
 RUN vcs import < dave.repos
 
 RUN apt-get update && rosdep update && \
