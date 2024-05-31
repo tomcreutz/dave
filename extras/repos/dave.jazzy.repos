@@ -1,0 +1,5 @@
+repositories:
+  dockwater:
+    type: git
+    url: https://github.com/Field-Robotics-Lab/dockwater.git
+    version: main
