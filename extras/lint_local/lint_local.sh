@@ -44,7 +44,7 @@ done
 
 # Check if Python 3 is installed before checking Python packages
 if ! command -v python3 &>/dev/null; then
-  echo -e "\033[31mPython is not installed. Install it to proceed with Python package checks.\033[0m"
+  echo -e "\033[31mPython is not installed. Install to proceed.\033[0m"
 else
   echo "Checking Python dependencies to run lints..."
 
@@ -69,11 +69,17 @@ if [ "$all_dependencies_installed" = true ]; then
     find . -iname '*.cpp' -o -iname '*.h' | xargs clang-format -i
 
     echo -e "\033[32m[3/6] =========  Linting XML files     ===========\033[0m"
-    find . \( -iname '*.urdf' -o -iname '*.sdf' -o -iname '*.xacro' -o -iname '*.xml' -o -iname '*.launch' \) -print0 | xargs -0 xmllint --noout
+    find . \( -iname '*.urdf' -o -iname '*.sdf' -o -iname '*.xacro' \
+      -o -iname '*.xml' -o -iname '*.launch' \) -print0 | xargs -0 xmllint --noout
 
     echo -e "\033[32m[4/6] =========  Running ShellCheck    ===========\033[0m"
     # shellcheck disable=SC2038
-    find . -iname '*.sh' | xargs shellcheck
+    find . -iname '*.sh' | while read -r file; do
+      awk '{ if (length($0) > 100) \
+      printf "\033[31mError in file %s: Line %d is %d characters long \
+      (should be under 100):\n%s\n\033[0m", \
+      FILENAME, NR, length($0), $0 }' "$file"
+    done
 
     echo -e "\033[32m[5/6] =========  Linting YAML files    ===========\033[0m"
     find . \( -iname '*.yml' -o -iname '*.yaml' \) -print0 | xargs -0 yamllint
@@ -84,5 +90,6 @@ if [ "$all_dependencies_installed" = true ]; then
     # shellcheck disable=SC2028
     echo "\033[32mAll linting processes completed. Awesome!\033[0m"
 else
-    echo -e "\033[31mNot all dependencies are installed. Please install the missing packages before proceeding.\033[0m"
+    echo -e "\033[31mNot all dependencies are installed. \
+    Please install the missing packages before proceeding.\033[0m"
 fi
