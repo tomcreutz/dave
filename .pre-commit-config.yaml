@@ -157,6 +157,6 @@ repos:
   - repo: https://github.com/turo/pre-commit-hooks
     rev: v3.5.0  # You may version pin this if desired
     hooks:
-    - id: docker-lint
-      files: \.dockerfile
-    - id: docker-compose-lint
+      - id: docker-lint
+        files: \.dockerfile
+      - id: docker-compose-lint
