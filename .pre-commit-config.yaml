@@ -13,16 +13,16 @@
 # See https://github.com/pre-commit/pre-commit
 ---
 ci:
-    autofix_commit_msg: |
-        [pre-commit.ci] auto fixes from pre-commit.com hooks
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
 
-        for more information, see https://pre-commit.ci
-    autofix_prs: true
-    autoupdate_branch: ros2
-    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-    autoupdate_schedule: weekly
-    skip: []
-    submodules: false
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ros2
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
 
 repos:
   # Standard hooks
@@ -165,9 +165,8 @@ repos:
         types: [text]
         files: \.(xacro|urdf|sdf|xml|launch)$
 
-
   - repo: https://github.com/turo/pre-commit-hooks
-    rev: v3.5.0  # You may version pin this if desired
+    rev: v3.5.0
     hooks:
       - id: docker-lint
         files: \.dockerfile
