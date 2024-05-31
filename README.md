@@ -1,5 +1,4 @@
 # DAVE
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/IOES-Lab/dave/ros2.svg)](https://results.pre-commit.ci/latest/github/IOES-Lab/dave/ros2)
 
 All documentation of Project DAVE can be found in the [Dave Documentation (https://field-robotics-lab.github.io/dave.doc/)](https://field-robotics-lab.github.io/dave.doc/).
 
