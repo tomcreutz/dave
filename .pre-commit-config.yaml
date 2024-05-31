@@ -152,3 +152,10 @@ repos:
         language: system
         types: [text]
         files: \.(xacro|urdf|sdf|xml|launch)$
+
+
+  - repo: https://github.com/turo/pre-commit-hooks
+    rev: v3.5.0  # You may version pin this if desired
+    hooks:
+    - id: docker-lint
+    - id: docker-compose-lint
