@@ -33,6 +33,8 @@ echo "Installation complete!"
 
 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
     -o /usr/share/keyrings/ros-archive-keyring.gpg
+sudo wget https://packages.osrfoundation.org/gazebo.gpg \
+    -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 
 ARCH=$(dpkg --print-architecture)
 # shellcheck disable=SC1091
