@@ -59,6 +59,7 @@ sudo apt install -y \
     python3-rosdep \
     python3-rosinstall-generator \
     python3-vcstool \
+    ros-${DIST}-desktop-full \
     ros-${DIST}-gz-plugin-vendor \
     ros-${DIST}-gz-ros2-control \
     ros-${DIST}-effort-controllers \
@@ -85,4 +86,6 @@ sudo apt install -y \
     ros-${DIST}-tf2-geometry-msgs \
     ros-${DIST}-tf2-tools \
     ros-${DIST}-urdfdom-py \
-    ros-${DIST}-xacro
+    ros-${DIST}-xacro \
+    ros-dev-tools \
+    ros-${DIST}-ros-gz \
