@@ -83,21 +83,6 @@ FROM woensugchoi/ubuntu-arm-rdp-base:latest
 ARG BRANCH="ros2"
 ARG ROS_DISTRO="jazzy"
 
-# Locale for UTF-8
-RUN truncate -s0 /tmp/preseed.cfg && \
-   (echo "tzdata tzdata/Areas select Etc" >> /tmp/preseed.cfg) && \
-   (echo "tzdata tzdata/Zones/Etc select UTC" >> /tmp/preseed.cfg) && \
-   debconf-set-selections /tmp/preseed.cfg && \
-   rm -f /etc/timezone && \
-   dpkg-reconfigure -f noninteractive tzdata
-# hadolint ignore=DL3008
-RUN apt-get update && \
-    apt-get -y install --no-install-recommends locales tzdata \
-    && rm -rf /tmp/*
-RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
-    export LANG=en_US.UTF-8
-
-
 # Install ROS-Gazebo framework
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/ros-jazzy-gz-harmonic-install.sh install.sh
