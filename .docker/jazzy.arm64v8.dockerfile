@@ -4,8 +4,8 @@ ARG ROS_DISTRO="jazzy"
 
 EXPOSE 3389/tcp
 # EXPOSE 22/tcp
-ARG USER=ioes
-ARG PASS=ioes
+ARG USER=dave
+ARG PASS=dave
 ARG X11Forwarding=false
 
 # Set RDP and SSH environments
@@ -86,7 +86,7 @@ ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/ros-jazzy-gz-harmonic-install.sh install.sh
 RUN bash install.sh
 
-ENV ROS_UNDERLAY /root/ws_dave/install
+ENV ROS_UNDERLAY /home/$USER/dave_ws/install
 WORKDIR $ROS_UNDERLAY/../src
 
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
@@ -107,6 +107,9 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
 # source entrypoint setup
 RUN sed --in-place --expression \
     '$i source "$ROS_UNDERLAY/setup.bash"' /ros_entrypoint.sh
+
+# Set User as user
+USER $USER
 
 # Use software rendering for container
 ENV LIBGL_ALWAYS_INDIRECT=1
