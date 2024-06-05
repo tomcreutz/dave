@@ -1,6 +1,6 @@
-ARG ROS_DISTRO="jazzy"
 FROM arm64v8/ubuntu:24.04
 ARG BRANCH="ros2"
+ARG ROS_DISTRO="jazzy"
 
 # update and upgrade libs
 RUN apt-get update \
@@ -34,7 +34,7 @@ ENV ROS_UNDERLAY /root/ws_dave/install
 WORKDIR $ROS_UNDERLAY/../src
 
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-extras/repos/dave.$ROS_DISTRO.repos dave.repos
+extras/repos/dave.jazzy.repos dave.repos
 RUN vcs import < dave.repos
 
 RUN apt-get update && rosdep update && \
