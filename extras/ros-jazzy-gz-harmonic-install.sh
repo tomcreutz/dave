@@ -55,37 +55,37 @@ DIST=jazzy
 GAZ=gz-harmonic
 
 sudo apt install -y \
-    ${GAZ} \
+    $GAZ \
     python3-rosdep \
     python3-rosinstall-generator \
     python3-vcstool \
-    ros-${DIST}-desktop-full \
-    ros-${DIST}-gz-plugin-vendor \
-    ros-${DIST}-gz-ros2-control \
-    ros-${DIST}-effort-controllers \
-    ros-${DIST}-geographic-info \
-    ros-${DIST}-image-view \
-    ros-${DIST}-joint-state-publisher \
-    ros-${DIST}-joy \
-    ros-${DIST}-joy-teleop \
-    ros-${DIST}-key-teleop \
-    ros-${DIST}-moveit-planners \
-    ros-${DIST}-moveit-simple-controller-manager \
-    ros-${DIST}-moveit-ros-visualization \
-    ros-${DIST}-pcl-ros \
-    ros-${DIST}-robot-localization \
-    ros-${DIST}-robot-state-publisher \
-    ros-${DIST}-ros-base \
-    ros-${DIST}-ros2-controllers \
-    ros-${DIST}-rqt \
-    ros-${DIST}-rqt-common-plugins \
-    ros-${DIST}-rviz2 \
-    ros-${DIST}-teleop-tools \
-    ros-${DIST}-teleop-twist-joy \
-    ros-${DIST}-teleop-twist-keyboard \
-    ros-${DIST}-tf2-geometry-msgs \
-    ros-${DIST}-tf2-tools \
-    ros-${DIST}-urdfdom-py \
-    ros-${DIST}-xacro \
+    ros-$DIST-desktop-full \
+    ros-$DIST-gz-plugin-vendor \
+    ros-$DIST-gz-ros2-control \
+    ros-$DIST-effort-controllers \
+    ros-$DIST-geographic-info \
+    ros-$DIST-image-view \
+    ros-$DIST-joint-state-publisher \
+    ros-$DIST-joy \
+    ros-$DIST-joy-teleop \
+    ros-$DIST-key-teleop \
+    ros-$DIST-moveit-planners \
+    ros-$DIST-moveit-simple-controller-manager \
+    ros-$DIST-moveit-ros-visualization \
+    ros-$DIST-pcl-ros \
+    ros-$DIST-robot-localization \
+    ros-$DIST-robot-state-publisher \
+    ros-$DIST-ros-base \
+    ros-$DIST-ros2-controllers \
+    ros-$DIST-rqt \
+    ros-$DIST-rqt-common-plugins \
+    ros-$DIST-rviz2 \
+    ros-$DIST-teleop-tools \
+    ros-$DIST-teleop-twist-joy \
+    ros-$DIST-teleop-twist-keyboard \
+    ros-$DIST-tf2-geometry-msgs \
+    ros-$DIST-tf2-tools \
+    ros-$DIST-urdfdom-py \
+    ros-$DIST-xacro \
     ros-dev-tools \
-    ros-${DIST}-ros-gz \
+    ros-$DIST-ros-gz \
