@@ -65,7 +65,7 @@ RUN apt-get update \
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN=true
 # hadolint ignore=DL3008
-RUN apt-get update \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     sudo build-essential gfortran automake \
     bison flex libtool git wget \

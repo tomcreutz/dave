@@ -3,10 +3,10 @@ FROM osrf/ros:$ROS_DISTRO-desktop-full
 ARG BRANCH="ros2"
 
 # hadolint ignore=DL3008
-RUN apt-get update \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     sudo build-essential gfortran automake \
-    bison flex libtool git wget locales \
+    bison flex libtool git wget \
     software-properties-common nano && \
     rm -rf /var/lib/apt/lists/
 
