@@ -100,8 +100,8 @@ ENV ROS_UNDERLAY /home/$USER/dave_ws/install
 WORKDIR $ROS_UNDERLAY/../src
 
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-extras/repos/dave.jazzy.repos dave.repos
-RUN vcs import < dave.repos
+extras/repos/dave.$ROS_DISTRO.repos /home/$USER/ws_dave/dave.repos
+RUN vcs import --shallow --input /home/$USER/ws_dave/dave.repos
 
 RUN rosdep init && \
   rosdep update --rosdistro $ROS_DISTRO
