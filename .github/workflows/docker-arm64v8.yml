@@ -39,7 +39,7 @@ jobs:
         with:
           images: woensugchoi/dave
           tags: |
-            type=ref,event=branch,ref=ros2,format={{branch}}-arm64v8-rdp
+            type=ref,event=branch,ref=ros2,format={{branch}}-arm-rdp
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
