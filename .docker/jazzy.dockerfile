@@ -2,6 +2,10 @@ ARG ROS_DISTRO="jazzy"
 FROM osrf/ros:$ROS_DISTRO-desktop-full
 ARG BRANCH="ros2"
 
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
+extras/ros-jazzy-gz-harmonic-install.sh install.sh
+RUN bash install.sh
+
 ENV ROS_UNDERLAY /root/ws_dave/install
 WORKDIR $ROS_UNDERLAY/../src
 
