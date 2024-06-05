@@ -35,7 +35,7 @@
 # RUN echo "X-GNOME-Autostart-enabled=false" >> /etc/xdg/autostart/gnome-initial-setup-first-login.desktop
 
 # hadolint ignore=DL3007
-FROM woensugchoi/ubuntu-arm-rdp:latest
+FROM woensugchoi:ubuntu-arm-rdp
 
 ARG BRANCH="ros2"
 ARG ROS_DISTRO="jazzy"
