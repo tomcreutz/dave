@@ -1,42 +1,53 @@
-# FROM arm64v8/ubuntu:24.04
-# # Set RDP and SSH environments
-# ARG X11Forwarding=true
-# RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-#         apt-get install -y ubuntu-desktop-minimal dbus-x11 xrdp sudo; \
-#     [ $X11Forwarding = 'true' ] && apt-get install -y openssh-server; \
-#     apt-get autoremove --purge; \
-#     apt-get clean; \
-#     rm /run/reboot-required*
+FROM arm64v8/ubuntu:24.04
+# Set RDP and SSH environments
+ARG X11Forwarding=true
+# hadolint ignore=DL3008,DL3015,DL3009
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+        apt-get install -y ubuntu-desktop-minimal=1.539 dbus-x11 xrdp sudo; \
+    [ $X11Forwarding = 'true' ] && apt-get install -y openssh-server; \
+    apt-get autoremove --purge; \
+    apt-get clean; \
+    rm /run/reboot-required*
 
-# ARG USER=docker
-# ARG PASS=docker
+ARG USER=docker
+ARG PASS=docker
 
-# RUN useradd -s /bin/bash -m $USER -p $(openssl passwd "$PASS"); \
-#     usermod -aG sudo $USER; echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
-#     adduser xrdp ssl-cert; \
-#     # Setting the required environment variables
-#     echo 'LANG=en_US.UTF-8' >> /etc/default/locale; \
-#     echo 'export GNOME_SHELL_SESSION_MODE=ubuntu' > /home/$USER/.xsessionrc; \
-#     echo 'export XDG_CURRENT_DESKTOP=ubuntu:GNOME' >> /home/$USER/.xsessionrc; \
-#     echo 'export XDG_SESSION_TYPE=x11' >> /home/$USER/.xsessionrc; \
-#     # Enabling log to the stdout
-#     sed -i "s/#EnableConsole=false/EnableConsole=true/g" /etc/xrdp/xrdp.ini; \
-#     # Disabling system animations and reducing the
-#     # image quality to improve the performance
-#     sed -i 's/max_bpp=32/max_bpp=16/g' /etc/xrdp/xrdp.ini; \
-#     gsettings set org.gnome.desktop.interface enable-animations true; \
-#     # Listening on wildcard address for X forwarding
-#     [ $X11Forwarding = 'true' ] && \
-#         sed -i 's/#X11UseLocalhost yes/X11UseLocalhost no/g' /etc/ssh/sshd_config || \
-#         sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config || \
-#         :;
+RUN useradd -s /bin/bash -m $USER -p "$(openssl passwd "$PASS")"; \
+    usermod -aG sudo $USER; echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
+    adduser xrdp ssl-cert; \
+    # Setting the required environment variables
+    echo 'LANG=en_US.UTF-8' >> /etc/default/locale; \
+    echo 'export GNOME_SHELL_SESSION_MODE=ubuntu' > /home/$USER/.xsessionrc; \
+    echo 'export XDG_CURRENT_DESKTOP=ubuntu:GNOME' >> /home/$USER/.xsessionrc; \
+    echo 'export XDG_SESSION_TYPE=x11' >> /home/$USER/.xsessionrc; \
+    # Enabling log to the stdout
+    sed -i "s/#EnableConsole=false/EnableConsole=true/g" /etc/xrdp/xrdp.ini; \
+    # Disabling system animations and reducing the
+    # image quality to improve the performance
+    sed -i 's/max_bpp=32/max_bpp=16/g' /etc/xrdp/xrdp.ini; \
+    gsettings set org.gnome.desktop.interface enable-animations true; \
+    # Listening on wildcard address for X forwarding
+    [ $X11Forwarding = 'true' ] && \
+        sed -i 's/#X11UseLocalhost yes/X11UseLocalhost no/g' /etc/ssh/sshd_config || \
+        sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config || \
+        :;
 
-# # Disable initial welcome window
-# RUN echo "X-GNOME-Autostart-enabled=false" >> /etc/xdg/autostart/gnome-initial-setup-first-login.desktop
+# Disable initial welcome window
+RUN echo "X-GNOME-Autostart-enabled=false" >> /etc/xdg/autostart/gnome-initial-setup-first-login.desktop
 
-# hadolint ignore=DL3007
-FROM woensugchoi:ubuntu-arm-rdp
+# Run
+EXPOSE 3389/tcp
+EXPOSE 22/tcp
+# hadolint ignore=DL3025
+CMD sudo rm -f /var/run/xrdp/xrdp*.pid >/dev/null 2>&1; \
+    sudo service dbus restart >/dev/null 2>&1; \
+    sudo /usr/lib/systemd/systemd-logind >/dev/null 2>&1 & \
+    [ -f /usr/sbin/sshd ] && sudo /usr/sbin/sshd; \
+    sudo xrdp-sesman --config /etc/xrdp/sesman.ini; \
+    sudo xrdp --nodaemon --config /etc/xrdp/xrdp.ini
 
+
+# ROS-Gazebo arg
 ARG BRANCH="ros2"
 ARG ROS_DISTRO="jazzy"
 
