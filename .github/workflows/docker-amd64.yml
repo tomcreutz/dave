@@ -1,5 +1,5 @@
 ---
-name: Create and publish a Docker image
+name: Publish a Docker image (AMD64; Common X86_64 Linux Machine)
 
 # yamllint disable-line rule:truthy
 on:

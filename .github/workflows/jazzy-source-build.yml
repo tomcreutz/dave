@@ -61,6 +61,14 @@ jobs:
       - uses: ros-tooling/setup-ros@0.7.7
         with:
           use-ros2-testing: true
+
+      - name: "Install ROS-Gazebo Framework Deps"
+        id: install-ros-gazebo
+        run: |
+          sudo /bin/bash -c "$(
+            curl -fsSL https://raw.githubusercontent.com/IOES-Lab/dave/ros2/extras/ros-jazzy-gz-harmonic-install.sh
+          )"
+
       - uses: actions/checkout@v4
         with:
           path: ${{ env.path }}
