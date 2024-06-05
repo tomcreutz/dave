@@ -5,12 +5,21 @@ ARG BRANCH="ros2"
 # hadolint ignore=DL3008
 RUN apt-get update \
     apt-get install -y --no-install-recommends \
-    sudo tzdata build-essential gfortran automake \
+    sudo build-essential gfortran automake \
     bison flex libtool git wget locales \
     software-properties-common nano && \
     rm -rf /var/lib/apt/lists/
 
 # Locale for UTF-8
+RUN truncate -s0 /tmp/preseed.cfg && \
+   (echo "tzdata tzdata/Areas select Etc" >> /tmp/preseed.cfg) && \
+   (echo "tzdata tzdata/Zones/Etc select UTC" >> /tmp/preseed.cfg) && \
+   debconf-set-selections /tmp/preseed.cfg && \
+   rm -f /etc/timezone && \
+   dpkg-reconfigure -f noninteractive tzdata
+# hadolint ignore=DL3008
+RUN apt-get -y install --no-install-recommends locales tzdata \
+    && rm -rf /tmp/*
 RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
     export LANG=en_US.UTF-8
 
@@ -27,8 +36,7 @@ RUN bash install.sh
 # Make user (assume host user has 1000:1000 permission)
 ARG USER=dave
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN addgroup --gid 1000 $USER && \
-    adduser --uid 1000 --ingroup $USER --shell /bin/bash --disabled-password --gecos '' $USER \
+RUN adduser --shell /bin/bash --disabled-password --gecos '' $USER \
     && echo "$USER:$USER" | chpasswd && adduser $USER sudo \
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 # Set User as user

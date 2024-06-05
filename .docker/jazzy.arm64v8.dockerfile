@@ -67,12 +67,21 @@ ENV DEBCONF_NONINTERACTIVE_SEEN=true
 # hadolint ignore=DL3008
 RUN apt-get update \
     apt-get install -y --no-install-recommends \
-    sudo tzdata build-essential gfortran automake \
-    bison flex libtool git wget locales \
+    sudo build-essential gfortran automake \
+    bison flex libtool git wget \
     software-properties-common nano && \
     rm -rf /var/lib/apt/lists/
 
 # Locale for UTF-8
+RUN truncate -s0 /tmp/preseed.cfg && \
+   (echo "tzdata tzdata/Areas select Etc" >> /tmp/preseed.cfg) && \
+   (echo "tzdata tzdata/Zones/Etc select UTC" >> /tmp/preseed.cfg) && \
+   debconf-set-selections /tmp/preseed.cfg && \
+   rm -f /etc/timezone && \
+   dpkg-reconfigure -f noninteractive tzdata
+# hadolint ignore=DL3008
+RUN apt-get -y install --no-install-recommends locales tzdata \
+   && rm -rf /tmp/*
 RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
     export LANG=en_US.UTF-8
 
