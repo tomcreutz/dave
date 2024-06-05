@@ -1,5 +1,10 @@
 repositories:
   dockwater:
     type: git
-    url: https://github.com/Field-Robotics-Lab/dockwater.git
+    url: https://github.com/IOES-Lab/dockwater.git
+    version: main
+
+  rocker:
+    type: git
+    url: https://github.com/IOES-Lab/rocker.git
     version: main
