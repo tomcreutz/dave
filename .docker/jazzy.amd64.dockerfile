@@ -66,3 +66,4 @@ RUN touch /ros_entrypoint.sh && sed --in-place --expression \
 
 # Set User as user
 USER $USER
+RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
