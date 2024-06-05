@@ -2,12 +2,18 @@ ARG ROS_DISTRO="jazzy"
 FROM osrf/ros:$ROS_DISTRO-desktop-full
 ARG BRANCH="ros2"
 
+# Install Utilities
 # hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    sudo build-essential gfortran automake \
-    bison flex libtool git wget \
-    software-properties-common nano && \
+    sudo xterm init systemd snapd vim net-tools \
+    curl wget git build-essential cmake cppcheck \
+    gnupg libeigen3-dev libgles2-mesa-dev \
+    lsb-release pkg-config protobuf-compiler \
+    python3-dbg python3-pip python3-venv \
+    qtbase5-dev ruby dirmngr gnupg2 nano xauth \
+    software-properties-common htop libtool \
+    x11-apps mesa-utils bison flex automake && \
     rm -rf /var/lib/apt/lists/
 
 # Locale for UTF-8
@@ -24,45 +30,39 @@ RUN apt-get update && \
 RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
     export LANG=en_US.UTF-8
 
-# Install Utilities
-# hadolint ignore=DL3008
-RUN apt-get -y install --no-install-recommends \
-    x11-apps mesa-utils xauth && \
-    rm -rf /var/lib/apt/lists/
-
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-extras/ros-jazzy-gz-harmonic-install.sh install.sh
-RUN bash install.sh
-
 # Make user (assume host user has 1000:1000 permission)
-ARG USER=dave
+ARG USER=docker
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN adduser --shell /bin/bash --disabled-password --gecos '' $USER \
     && echo "$USER:$USER" | chpasswd && adduser $USER sudo \
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# RUN adduser --shell /bin/bash --disabled-password --gecos "" user \
-#     && echo 'user:user' | chpasswd && adduser user sudo \
-#     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+# Install ROS-Gazebo framework
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
+extras/ros-jazzy-gz-harmonic-install.sh install.sh
+RUN bash install.sh
 
-ENV ROS_UNDERLAY /home/$USER/ws_dave/install
-WORKDIR $ROS_UNDERLAY/../src
+# Set up Dave workspace
+ENV DAVE_WS /root/ws_dave
+WORKDIR $DAVE_WS/src
 
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-extras/repos/dave.$ROS_DISTRO.repos /home/$USER/ws_dave/dave.repos
-RUN vcs import --shallow --input /home/$USER/ws_dave/dave.repos
+extras/repos/dave.$ROS_DISTRO.repos $DAVE_WS/dave.repos
+RUN vcs import --shallow --input $DAVE_WS/dave.repos
 
+# Install dave dependencies
 RUN apt-get update && rosdep update && \
     rosdep install -iy --from-paths . && \
     rm -rf /var/lib/apt/lists/
 
-WORKDIR $ROS_UNDERLAY/..
+# Compile Dave
+WORKDIR $DAVE_WS
 RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
     colcon build
 
 # source entrypoint setup
-RUN sed --in-place --expression \
-    '$i source "$ROS_UNDERLAY/setup.bash"' /ros_entrypoint.sh
+RUN touch /ros_entrypoint.sh && sed --in-place --expression \
+    '$i source "$DAVE_WS/install/setup.bash"' /ros_entrypoint.sh
 
 # Set User as user
 USER $USER
