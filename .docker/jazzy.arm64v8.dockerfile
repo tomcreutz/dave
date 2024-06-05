@@ -69,7 +69,7 @@ RUN apt-get update \
     apt-get install -y --no-install-recommends \
     sudo tzdata build-essential gfortran automake \
     bison flex libtool git wget locales \
-    software-properties-common && \
+    software-properties-common nano && \
     rm -rf /var/lib/apt/lists/
 
 # Locale for UTF-8

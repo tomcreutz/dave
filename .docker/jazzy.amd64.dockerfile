@@ -2,6 +2,24 @@ ARG ROS_DISTRO="jazzy"
 FROM osrf/ros:$ROS_DISTRO-desktop-full
 ARG BRANCH="ros2"
 
+# hadolint ignore=DL3008
+RUN apt-get update \
+    apt-get install -y --no-install-recommends \
+    sudo tzdata build-essential gfortran automake \
+    bison flex libtool git wget locales \
+    software-properties-common nano && \
+    rm -rf /var/lib/apt/lists/
+
+# Locale for UTF-8
+RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
+    export LANG=en_US.UTF-8
+
+# Install Utilities
+# hadolint ignore=DL3008
+RUN apt-get -y install --no-install-recommends \
+    x11-apps mesa-utils xauth && \
+    rm -rf /var/lib/apt/lists/
+
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/ros-jazzy-gz-harmonic-install.sh install.sh
 RUN bash install.sh
