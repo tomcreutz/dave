@@ -1,13 +1,20 @@
 #!/bin/bash
 # Script to install development tools and libraries for robotics and simulation
+echo
+echo -e "\033[94m============================================================\033[0m"
+echo -e "\033[94m== One-liner Installation Script for ROS-Gazebo Framework ==\033[0m"
+echo -e "\033[94m============================================================\033[0m"
+echo -e "Requirements: Ubuntu 24.04 LTS Noble"
+echo -e "\033[94m============================================================\033[0m"
 
-echo "Updating package lists..."
-sudo apt update
-
+echo
+echo -e "\033[96m(1/4) -------------    Updating the System  ----------------\033[0m"
 echo "Performing full system upgrade (this might take a while)..."
-sudo apt full-upgrade -y
+sudo sudo apt update && apt full-upgrade -y
 
-echo "Installing essential tools and libraries..."
+echo
+echo -e "\033[96m(2/4) ------------    Install Dependencies   ---------------\033[0m"
+echo -e "\033[34mInstalling essential tools and libraries...\033[0m"
 sudo apt install -y \
     build-essential \
     cmake \
@@ -29,9 +36,9 @@ sudo apt install -y \
     sudo \
     wget
 
-echo "Installation complete!"
-
-echo "Installing Signing Keys for ROS and Gazebo..."
+echo
+echo -e "\033[96m(3/4) ------------    Install Package Keys   ---------------\033[0m"
+echo -e "\033[34mInstalling Signing Keys for ROS and Gazebo...\033[0m"
 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
     -o /usr/share/keyrings/ros-archive-keyring.gpg
 sudo wget https://packages.osrfoundation.org/gazebo.gpg \
@@ -49,39 +56,50 @@ REPO="deb [arch=$ARCH signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gp
 http://packages.osrfoundation.org/gazebo/ubuntu-stable $DISTRO main"
 echo "$REPO" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list >/dev/null
 
-echo "Installing ROS Gazebo framework..."
+echo
+echo -e "\033[96m(4/4) ------------     Install ROS-Gazebo    ---------------\033[0m"
+DIST=jazzy
+GAZEBO=gz-harmonic
+
+echo -e "\033[34mInstalling ROS Gazebo framework...\033[0m"
 sudo apt update && apt install -y \
     python3-rosdep \
     python3-rosinstall-generator \
     python3-vcstool \
-    gz-harmonic \
-    ros-jazzy-desktop-full \
-    ros-jazzy-gz-plugin-vendor \
-    ros-jazzy-gz-ros2-control \
-    ros-jazzy-effort-controllers \
-    ros-jazzy-geographic-info \
-    ros-jazzy-image-view \
-    ros-jazzy-joint-state-publisher \
-    ros-jazzy-joy \
-    ros-jazzy-joy-teleop \
-    ros-jazzy-key-teleop \
-    ros-jazzy-moveit-planners \
-    ros-jazzy-moveit-simple-controller-manager \
-    ros-jazzy-moveit-ros-visualization \
-    ros-jazzy-pcl-ros \
-    ros-jazzy-robot-localization \
-    ros-jazzy-robot-state-publisher \
-    ros-jazzy-ros-base \
-    ros-jazzy-ros2-controllers \
-    ros-jazzy-rqt \
-    ros-jazzy-rqt-common-plugins \
-    ros-jazzy-rviz2 \
-    ros-jazzy-teleop-tools \
-    ros-jazzy-teleop-twist-joy \
-    ros-jazzy-teleop-twist-keyboard \
-    ros-jazzy-tf2-geometry-msgs \
-    ros-jazzy-tf2-tools \
-    ros-jazzy-urdfdom-py \
-    ros-jazzy-xacro \
+    $GAZEBO \
+    ros-$DIST-desktop-full \
+    ros-$DIST-gz-plugin-vendor \
+    ros-$DIST-gz-ros2-control \
+    ros-$DIST-effort-controllers \
+    ros-$DIST-geographic-info \
+    ros-$DIST-image-view \
+    ros-$DIST-joint-state-publisher \
+    ros-$DIST-joy \
+    ros-$DIST-joy-teleop \
+    ros-$DIST-key-teleop \
+    ros-$DIST-moveit-planners \
+    ros-$DIST-moveit-simple-controller-manager \
+    ros-$DIST-moveit-ros-visualization \
+    ros-$DIST-pcl-ros \
+    ros-$DIST-robot-localization \
+    ros-$DIST-robot-state-publisher \
+    ros-$DIST-ros-base \
+    ros-$DIST-ros2-controllers \
+    ros-$DIST-rqt \
+    ros-$DIST-rqt-common-plugins \
+    ros-$DIST-rviz2 \
+    ros-$DIST-teleop-tools \
+    ros-$DIST-teleop-twist-joy \
+    ros-$DIST-teleop-twist-keyboard \
+    ros-$DIST-tf2-geometry-msgs \
+    ros-$DIST-tf2-tools \
+    ros-$DIST-urdfdom-py \
+    ros-$DIST-xacro \
     ros-dev-tools \
-    ros-jazzy-ros-gz \
+    ros-$DIST-ros-gz
+
+echo
+echo -e "\033[32mROS-Gazebo Framework Installation completed. Awesome! 🤘🚀 \033[0m"
+echo -e "Following command will set-up ROS environment variables to run it"
+echo -e "\033[95msource /opt/ros/jazzy/setup.bash\033[0m"
+echo -e "You may check ROS, and Gazebo version installed with \033[33mprintenv ROS_DISTRO\033[0m and \033[33mecho \$GZ_VERSION\033[0m"

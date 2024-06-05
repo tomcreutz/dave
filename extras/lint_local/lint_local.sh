@@ -88,7 +88,7 @@ if [ "$all_dependencies_installed" = true ]; then
     find . \( -iname 'CMakeLists.txt' -o -iname '*.cmake' \) -print0 | xargs -0 cmake-lint
 
     # shellcheck disable=SC2028
-    echo -e "\033[32mAll linting completed. Awesome! Not ready to make PR. 🤘🚀 \033[0m"
+    echo -e "\033[32mAll linting completed. Awesome! Now, ready to make PR. 🤘🚀 \033[0m"
 else
     echo -e "\033[31mNot all dependencies are installed. \
     Please install the missing packages before proceeding.\033[0m"
