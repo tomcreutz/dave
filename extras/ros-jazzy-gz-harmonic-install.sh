@@ -99,7 +99,9 @@ sudo apt update && apt install -y \
     ros-$DIST-ros-gz
 
 echo
+echo -e "\033[32m============================================================\033[0m"
 echo -e "\033[32mROS-Gazebo Framework Installation completed. Awesome! 🤘🚀 \033[0m"
 echo -e "Following command will set-up ROS environment variables to run it"
 echo -e "\033[95msource /opt/ros/jazzy/setup.bash\033[0m"
 echo -e "You may check ROS, and Gazebo version installed with \033[33mprintenv ROS_DISTRO\033[0m and \033[33mecho \$GZ_VERSION\033[0m"
+echo
