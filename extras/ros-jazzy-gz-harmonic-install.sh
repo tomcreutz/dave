@@ -52,13 +52,12 @@ echo "$REPO" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list >/dev/null
 sudo apt update
 
 DIST=jazzy
-GAZEBO=gz-harmonic
 
 sudo apt install -y \
     python3-rosdep \
     python3-rosinstall-generator \
     python3-vcstool \
-    $GAZEBO \
+    gz-harmonic \
     ros-$DIST-desktop-full \
     ros-$DIST-gz-plugin-vendor \
     ros-$DIST-gz-ros2-control \
