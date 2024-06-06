@@ -78,6 +78,10 @@
 
 # hadolint ignore=DL3007
 FROM woensugchoi/ubuntu-arm-rdp-base:latest
+# In actual woensugchoi/ubuntu-arm-rdp-base:latest,
+# more packages are pre-installed to fasten the build process
+# Check https://github.com/IOES-Lab/ROS-Gazebo-Dockerfile/blob/ \
+# main/AppleSilicon/remote-desktop/ubuntu-rdp-base.dockerfile
 
 # ROS-Gazebo arg
 ARG BRANCH="ros2"
