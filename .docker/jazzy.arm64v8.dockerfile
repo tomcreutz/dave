@@ -76,6 +76,7 @@
 #     sudo xrdp-sesman --config /etc/xrdp/sesman.ini; \
 #     sudo xrdp --nodaemon --config /etc/xrdp/xrdp.ini
 
+# Using the pre-built image for above commented out dockerfile code lines
 # hadolint ignore=DL3007
 FROM woensugchoi/ubuntu-arm-rdp-base:latest
 
