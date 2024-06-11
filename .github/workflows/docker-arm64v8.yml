@@ -39,7 +39,7 @@ jobs:
         with:
           images: ioeslab/dave
           tags: |
-            type=ref,event=branch,ref=ros2,format={{branch}}-arm-rdp
+            type=ref,event=branch,pattern=^ros2$,format={{branch}}-arm-rdp
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
