@@ -38,8 +38,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ioeslab/dave
-          tags: |
-            type=ref,event=branch,pattern=^ros2$,format={{branch}}-arm-rdp
+          tags: ros2-arm-rdp
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
