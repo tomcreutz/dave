@@ -1,0 +1,26 @@
+launch:
+  - arg:
+      name: gazebo_world_file
+      default: empty.sdf
+
+  - arg:
+      name: use_sim
+      default: "true"
+
+  - arg:
+      name: model_name
+      default: mossy_cinder_block
+
+  - include:
+      file: $(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py
+      arg:
+        - name: gz_args
+          value: -v 4 -r $(var gazebo_world_file)
+
+  - include:
+      file: $(find-pkg-share dave_model_description)/launch/$(var model_name)/upload_$(var model_name).launch.yaml
+      arg:
+        - name: namespace
+          value: $(var model_name)
+        - name: use_sim
+          value: $(var use_sim)

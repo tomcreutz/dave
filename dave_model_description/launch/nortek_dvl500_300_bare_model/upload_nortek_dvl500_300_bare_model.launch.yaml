@@ -1,0 +1,18 @@
+launch:
+
+  - arg:
+      name: use_sim
+      default: "true"
+
+  - arg:
+      name: model_name
+      default: nortek_dvl500_300_bare_model
+
+  - let:
+      name: description_file
+      value: $(find-pkg-share dave_model_description)/description/$(var model_name)/model.sdf
+
+  - node:
+      pkg: ros_gz_sim
+      exec: create
+      args: -name $(var model_name) -x 0 -y 0 -z 0 -file $(var description_file)
