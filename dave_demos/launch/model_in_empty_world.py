@@ -3,7 +3,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
-    PythonExpression,
+    TextSubstitution,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition
@@ -11,6 +11,10 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    use_sim = LaunchConfiguration("use_sim")
+    model_name = LaunchConfiguration("model_name")
+    gazebo_world_file = LaunchConfiguration("gazebo_world_file")
+
     # Declare the launch arguments with default values
     args = [
         DeclareLaunchArgument(
@@ -25,14 +29,10 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_name",
-            default_value="nortek_dvl500_300_bare_model",
+            default_value="mossy_cinder_block",
             description="Name of the model to load",
         ),
     ]
-
-    use_sim = LaunchConfiguration("use_sim")
-    model_name = LaunchConfiguration("model_name")
-    gazebo_world_file = LaunchConfiguration("gazebo_world_file")
 
     # Include the first launch file
     gz_sim_launch = IncludeLaunchDescription(
@@ -51,19 +51,13 @@ def generate_launch_description():
             (
                 "gz_args",
                 [
-                    "-v",
-                    "4",
-                    " ",
-                    "-r",
-                    " ",
+                    "-r ",
                     gazebo_world_file,
                 ],
             ),
         ],
         condition=IfCondition(use_sim),
     )
-
-    model_launch_file = PythonExpression(["'upload_' + '", model_name, "' + '.launch.py'"])
 
     # Include the second launch file with model name
     model_launch = IncludeLaunchDescription(
@@ -73,8 +67,7 @@ def generate_launch_description():
                     [
                         FindPackageShare("dave_model_description"),
                         "launch",
-                        model_name,
-                        model_launch_file,
+                        "upload_model.launch.py",
                     ]
                 )
             ]

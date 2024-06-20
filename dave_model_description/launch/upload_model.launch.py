@@ -1,16 +1,20 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import (DeclareLaunchArgument, RegisterEventHandler, LogInfo)
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.conditions import IfCondition
 from launch_ros.substitutions import FindPackageShare
+from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    model_name = LaunchConfiguration("model_name")
+    use_sim = LaunchConfiguration("use_sim")
+
     args = [
         DeclareLaunchArgument(
             "model_name",
-            default_value="mossy_cinder_block",
+            default_value="model",
             description="Name of the model to load",
         ),
         DeclareLaunchArgument(
@@ -19,9 +23,6 @@ def generate_launch_description():
             description="Flag to indicate whether to use simulation",
         ),
     ]
-
-    model_name = LaunchConfiguration("model_name")
-    use_sim = LaunchConfiguration("use_sim")
 
     description_file = PathJoinSubstitution(
         [
@@ -43,4 +44,13 @@ def generate_launch_description():
 
     nodes = [gz_spawner]
 
-    return LaunchDescription(args + nodes)
+    event_handlers = [
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=gz_spawner,
+                on_exit=LogInfo(msg='Model Uploaded'))
+            )
+    ]
+    
+
+    return LaunchDescription(args + nodes + event_handlers)

@@ -28,7 +28,7 @@
           <mesh>
             <scale>1 1 1</scale>
             <!-- Mesh is actually for a Nortek DVL1000-4000m for now -->
-            <uri>model://meshes/nortek_dvl500_300_bare_model/DVL500-300m.dae</uri>
+            <uri>model://meshes/nortek_dvl500_300/DVL500-300m.dae</uri>
           </mesh>
         </geometry>
         <transparency>0</transparency>
