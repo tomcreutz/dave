@@ -5,12 +5,15 @@
 To launch a Dave model directly from a Fuel URI, follow these steps:
 
 1. Build and source the workspace:
+
    ```bash
    colcon build && source install/setup.bash
    ```
+
 2. Launch the model using the specified launch file:
+
    ```bash
-   ros2 launch dave_demos mossy_cinder_block.launch.yaml
+   ros2 launch dave_demos mossy_cinder_block.launch.py
    ```
 
 This method simplifies the process by pulling the model directly from Fuel, ensuring you always have the latest version without needing to manage local files.
@@ -19,17 +22,32 @@ This method simplifies the process by pulling the model directly from Fuel, ensu
 
 If you prefer to use model files downloaded from Fuel, proceed as follows:
 
-1. Set the resource path to your local model files:
+1. Add a hook within the `dave_model_description` package to configure the necessary environment variables for Gazebo model lookup.
+
    ```bash
-   export GZ_SIM_RESOURCE_PATH=<Path-to-dave_ws>/src/dave/dave_model_description
+   cd <path-to-dave_ws>/src/dave_model_description
+   mkdir hooks && cd hooks
+   touch dave_model_description.dsv.in
+   echo "prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@" >> dave_model_description.dsv.in
    ```
-2. Build and source the workspace:
+
+2. Append the following line to the CMakeLists.txt file in the `dave_model_description` package:
+
    ```bash
+   ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv.in")
+   ```
+
+3. Build and source the workspace:
+
+   ```bash
+   cd <path-to-dave_ws>
    colcon build && source install/setup.bash
    ```
-3. Launch the model using the provided launch file:
+
+4. Launch the model using the provided launch file:
+
    ```bash
-   ros2 launch dave_demos nortek_dvl500_300_bare_model.launch.yaml
+   ros2 launch dave_demos nortek_dvl500_300_bare_model.launch.py
    ```
 
 This approach gives you more control over the models you use, allowing for offline use and customization. It's especially useful when working in environments with limited internet connectivity or when specific model versions are required.
