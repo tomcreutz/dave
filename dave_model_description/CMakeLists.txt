@@ -8,4 +8,6 @@ install(
   DESTINATION share/dave_model_description
 )
 
+ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv.in")
+
 ament_package()
