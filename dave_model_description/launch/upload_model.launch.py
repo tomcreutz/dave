@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import (DeclareLaunchArgument, RegisterEventHandler, LogInfo)
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, LogInfo
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.conditions import IfCondition
 from launch_ros.substitutions import FindPackageShare
@@ -46,11 +46,8 @@ def generate_launch_description():
 
     event_handlers = [
         RegisterEventHandler(
-            OnProcessExit(
-                target_action=gz_spawner,
-                on_exit=LogInfo(msg='Model Uploaded'))
-            )
+            OnProcessExit(target_action=gz_spawner, on_exit=LogInfo(msg="Model Uploaded"))
+        )
     ]
-    
 
     return LaunchDescription(args + nodes + event_handlers)
