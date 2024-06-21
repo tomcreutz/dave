@@ -109,6 +109,17 @@ WORKDIR $ROS_UNDERLAY/..
 RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
     colcon build
 
+# Download the background image from GitHub raw content URL
+RUN wget -O /usr/share/backgrounds/custom-background.png \
+    https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
+    extras/background.png && \
+    mv /usr/share/backgrounds/warty-final-ubuntu.png \
+        /usr/share/backgrounds/warty-final-ubuntu.png.bak && \
+    mv /usr/share/backgrounds/custom-background.png \
+        /usr/share/backgrounds/warty-final-ubuntu.png && \
+    cp /usr/share/backgrounds/warty-final-ubuntu.png \
+        /usr/share/backgrounds/ubuntu-wallpaper-d.png
+
 # source entrypoint setup
 RUN touch /ros_entrypoint.sh && sed --in-place --expression \
     '$i source "$ROS_UNDERLAY/setup.bash"' /ros_entrypoint.sh
