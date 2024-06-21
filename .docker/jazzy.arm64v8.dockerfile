@@ -110,9 +110,10 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
     colcon build
 
 # Download the background image from GitHub raw content URL
-RUN wget -O /usr/share/backgrounds/custom-background.png \
+# hadolint ignore=DL3047
+RUN wget -O /usr/share/backgrounds/custom-background.png -q \
     https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-    extras/background.png && \
+extras/background.png && \
     mv /usr/share/backgrounds/warty-final-ubuntu.png \
         /usr/share/backgrounds/warty-final-ubuntu.png.bak && \
     mv /usr/share/backgrounds/custom-background.png \
