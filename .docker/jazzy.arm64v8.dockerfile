@@ -128,7 +128,27 @@ RUN touch /ros_entrypoint.sh && sed --in-place --expression \
 # Set User as user
 USER docker
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
-    echo "chown docker:docker ~/HOST" >> ~/.bashrc
+    echo "if [ -d ~/HOST ]; then chown docker:docker ~/HOST; fi" \
+    >> ~/.bashrc
 
-# Use software rendering for container
-ENV LIBGL_ALWAYS_INDIRECT=1
+# Other environment variables
+RUN echo "export XDG_RUNTIME_DIR=~/.xdg_log" >> ~/.bashrc && \
+    echo "unset SESSION_MANAGER" >> ~/.bashrc && \
+    echo "export LIBGL_ALWAYS_INDIRECT=1" >> ~/.bashrc
+
+# Create and write the welcome message to a new file
+RUN mkdir -p /home/docker/.config/autostart && \
+    printf '\033[1;32m\n =====\n\033[0m' >> ~/.hi && \
+    printf "\\033[1;32m 👋 Hi! This is Docker virtual environment\n\\033[0m" \
+    >> ~/.hi && \
+    printf "\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic\n\n\n\\033[0m" \
+    >> ~/.hi
+
+# Autostart terminal
+# hadolint ignore=SC3037
+RUN echo "[Desktop Entry]\nType=Application" \
+    > /home/docker/.config/autostart/terminal.desktop && \
+    echo "Exec=gnome-terminal -- bash -c 'cat ~/.hi; exec bash'" \
+    >> /home/docker/.config/autostart/terminal.desktop && \
+    echo -e "X-GNOME-Autostart-enabled=true" \
+    >> /home/docker/.config/autostart/terminal.desktop
