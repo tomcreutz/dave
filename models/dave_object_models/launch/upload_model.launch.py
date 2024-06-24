@@ -26,7 +26,7 @@ def generate_launch_description():
 
     description_file = PathJoinSubstitution(
         [
-            FindPackageShare("dave_models"),
+            FindPackageShare("dave_object_models"),
             "description",
             model_name,
             "model.sdf",
