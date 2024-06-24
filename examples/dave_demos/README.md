@@ -22,16 +22,16 @@ This method simplifies the process by pulling the model directly from Fuel, ensu
 
 If you prefer to use model files downloaded from Fuel, proceed as follows:
 
-1. Add a hook within the `dave_model_description` package to configure the necessary environment variables for Gazebo model lookup.
+1. Add a hook within the `dave_models` package to configure the necessary environment variables for Gazebo model lookup.
 
    ```bash
-   cd <path-to-dave_ws>/src/dave/dave_model_description
+   cd <path-to-dave_ws>/src/dave/models/dave_models
    mkdir hooks && cd hooks
-   touch dave_model_description.dsv.in
-   echo "prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@" >> dave_model_description.dsv.in
+   touch dave_models.dsv.in
+   echo "prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@" >> dave_models.dsv.in
    ```
 
-2. Append the following line to the CMakeLists.txt file in the `dave_model_description` package:
+2. Append the following line to the CMakeLists.txt file in the `dave_models` package:
 
    ```bash
    ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv.in")
