@@ -61,7 +61,7 @@ def generate_launch_description():
             [
                 PathJoinSubstitution(
                     [
-                        FindPackageShare("dave_model_description"),
+                        FindPackageShare("dave_object_models"),
                         "launch",
                         "upload_model.launch.py",
                     ]
