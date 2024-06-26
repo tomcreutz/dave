@@ -58,7 +58,7 @@
 			<specular>0.2 0.2 0.2 1</specular>
 			<direction>-1 0 0</direction>
 			<cast_shadows>false</cast_shadows>
-		</light> 
+		</light>
 
     <include>
       <uri>https://fuel.gazebosim.org/1.0/hmoyen/models/Graded Seabed</uri>

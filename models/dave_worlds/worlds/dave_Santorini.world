@@ -48,7 +48,6 @@
       <cast_shadows>false</cast_shadows>
     </light>
 
-    <!-- Virtual NED frame -->
     <include>
       <uri>
         https://fuel.gazebosim.org/1.0/hmoyen/models/North-East-Down frame

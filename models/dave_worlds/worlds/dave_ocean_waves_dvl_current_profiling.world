@@ -58,7 +58,6 @@
       <cast_shadows>false</cast_shadows>
     </light>
 
-    <!-- Virtual NED frame -->
     <include>
       <uri>https://fuel.gazebosim.org/1.0/hmoyen/models/North-East-Down frame</uri>
       <pose>0 0 0 0 0 0</pose>
@@ -73,7 +72,7 @@
 
      <model name="ocean">
       <static>true</static>
-      <link name="ocean_link"> 
+      <link name="ocean_link">
 
       <visual name="ocean_below">
         <pose>0 0 0 3.14 0 0</pose>
