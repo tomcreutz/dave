@@ -56,7 +56,7 @@
       <direction>-0.3 -0.3 -1</direction>
       <cast_shadows>false</cast_shadows>
     </light>
-    
+
     <light type="directional" name="sun_diffuse_1">
       <pose>-100 500 -20 0 0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -73,7 +73,6 @@
       <cast_shadows>false</cast_shadows>
     </light>
 
-    <!-- Virtual NED frame -->
     <include>
       <uri>https://fuel.gazebosim.org/1.0/hmoyen/models/North-East-Down frame</uri>
       <pose>0 0 0 0 0 0</pose>
@@ -89,7 +88,7 @@
     <!-- Sea surface, extracted from UUV Simulator ocean model -->
      <model name="ocean">
       <static>true</static>
-      <link name="ocean_link"> 
+      <link name="ocean_link">
 
       <visual name="ocean_below">
         <pose>0 0 0 3.14 0 0</pose>
