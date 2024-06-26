@@ -133,8 +133,7 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
 
 # Other environment variables
 RUN echo "export XDG_RUNTIME_DIR=~/.xdg_log" >> ~/.bashrc && \
-    echo "unset SESSION_MANAGER" >> ~/.bashrc && \
-    echo "export LIBGL_ALWAYS_INDIRECT=1" >> ~/.bashrc
+    echo "unset SESSION_MANAGER" >> ~/.bashrc
 
 # Create and write the welcome message to a new file
 RUN mkdir -p /home/docker/.config/autostart && \
