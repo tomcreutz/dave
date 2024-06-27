@@ -8,8 +8,8 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    robot_name = LaunchConfiguration("robot_name")
-    use_sim = LaunchConfiguration("use_sim")
+    gui = LaunchConfiguration("gui")
+    use_sim_time = LaunchConfiguration("use_sim_time")
     namespace = LaunchConfiguration("namespace")
     x = LaunchConfiguration("x")
     y = LaunchConfiguration("y")
@@ -21,9 +21,14 @@ def generate_launch_description():
 
     args = [
         DeclareLaunchArgument(
-            "use_sim",
+            "gui",
             default_value="true",
             description="Flag to indicate whether to use simulation",
+        ),
+        DeclareLaunchArgument(
+            "use_sim_time",
+            default_value="true",
+            description="Flag to indicate whether to use sim time",
         ),
         DeclareLaunchArgument(
             "namespace",
@@ -42,7 +47,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "z",
-            default_value="-20",
+            default_value="0.0",
             description="Initial z position",
         ),
         DeclareLaunchArgument(
@@ -63,7 +68,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "use_ned_frame",
             default_value="false",
-            description="Use NED frame",
+            description="Use North-East-Down frame",
         ),
     ]
 
@@ -76,16 +81,52 @@ def generate_launch_description():
         ]
     )
 
+    tf2_spawner = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="world_to_world_ned",
+        arguments=[
+            "--roll",
+            "1.57",
+            "--yaw",
+            "3.14",
+            "--frame_id",
+            "world",
+            "--child_frame_id",
+            "world_ned",
+        ],
+        output="both",
+        condition=IfCondition(use_ned_frame),
+        parameters=[{"use_sim_time_time": use_sim_time}],
+    )
+
     gz_spawner = Node(
         package="ros_gz_sim",
         executable="create",
-        arguments=["-name", namespace, "-file", description_file],
+        arguments=[
+            "-name",
+            namespace,
+            "-file",
+            description_file,
+            "-x",
+            x,
+            "-y",
+            y,
+            "-z",
+            z,
+            "-roll",
+            roll,
+            "-pitch",
+            pitch,
+            "-yaw",
+            yaw,
+        ],
         output="both",
-        condition=IfCondition(use_sim),
-        parameters=[{"use_sim_time": use_sim}],
+        condition=IfCondition(gui),
+        parameters=[{"use_sim_time_time": use_sim_time}],
     )
 
-    nodes = [gz_spawner]
+    nodes = [tf2_spawner, gz_spawner]
 
     event_handlers = [
         RegisterEventHandler(
