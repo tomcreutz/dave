@@ -24,21 +24,18 @@ def launch_setup(context, *args, **kwargs):
     use_ned_frame = LaunchConfiguration("use_ned_frame")
 
     # Replace dave_robot_models with dave_worlds after GSOC-51 PR is merged
-    world_name = PathJoinSubstitution(
-        [
-            FindPackageShare("dave_robot_models"),
-            "worlds",
-            world_name
-        ]
-    )
+    if world_name.perform(context) != "empty.sdf":
+        world_name = PathJoinSubstitution(
+            [FindPackageShare("dave_robot_models"), "worlds", world_name]
+        )
 
     gz_args = [world_name]
 
-    if headless.perform(context) == 'true':
+    if headless.perform(context) == "true":
         gz_args.append(" -s")
-    if paused.perform(context) == 'false':
+    if paused.perform(context) == "false":
         gz_args.append(" -r")
-    if debug.perform(context) == 'true':
+    if debug.perform(context) == "true":
         gz_args.append(" -v ")
         gz_args.append(verbose.perform(context))
 
@@ -56,10 +53,7 @@ def launch_setup(context, *args, **kwargs):
             ]
         ),
         launch_arguments=[
-            (
-                "gz_args",
-                gz_args
-            ),
+            ("gz_args", gz_args),
         ],
         condition=IfCondition(gui),
     )
@@ -94,7 +88,6 @@ def launch_setup(context, *args, **kwargs):
     include = [gz_sim_launch, robot_launch]
 
     return include
-
 
 
 def generate_launch_description():
@@ -174,7 +167,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "use_ned_frame",
             default_value="false",
-            description="Flag to indicate whether to use the NED frame",
+            description="Flag to indicate whether to use the north-east-down frame",
         ),
     ]
 
