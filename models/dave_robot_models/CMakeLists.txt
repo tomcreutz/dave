@@ -4,7 +4,7 @@ project(dave_robot_models)
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY description launch meshes worlds
+  DIRECTORY description launch meshes
   DESTINATION share/dave_robot_models
 )
 

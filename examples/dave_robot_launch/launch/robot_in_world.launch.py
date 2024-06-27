@@ -23,13 +23,15 @@ def launch_setup(context, *args, **kwargs):
     yaw = LaunchConfiguration("yaw")
     use_ned_frame = LaunchConfiguration("use_ned_frame")
 
-    # Replace dave_robot_models with dave_worlds after GSOC-51 PR is merged
     if world_name.perform(context) != "empty.sdf":
-        world_name = PathJoinSubstitution(
-            [FindPackageShare("dave_robot_models"), "worlds", world_name]
+        world_name = LaunchConfiguration("world_name").perform(context)
+        world_filename = f"{world_name}.world"
+        world_filepath = PathJoinSubstitution(
+            [FindPackageShare("dave_worlds"), "worlds", world_filename]
         )
-
-    gz_args = [world_name]
+        gz_args = [world_filepath]
+    else:
+        gz_args = [world_name]
 
     if headless.perform(context) == "true":
         gz_args.append(" -s")
