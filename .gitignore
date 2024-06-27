@@ -38,3 +38,6 @@
 
 # vs code
 .vscode
+
+# Mac
+.DS_Store

@@ -65,9 +65,11 @@ colcon build && source install/setup.bash
 1. Launch the world using the specified launch file
 
 ```bash
-ros2 launch dave_demos dave_world.launch.py world_name:=dave_integrated
+ros2 launch dave_demos dave_world.launch.py world_name:='dave_ocean_waves'
 ```
 
 To check which worlds are available to launch, refer to `models/dave_worlds/worlds` directory.
+
+The worlds files are linked to use models at https://app.gazebosim.org/ which means you need an internet connection to download the models and it takes some time to download at first launch. The files are saved in temporary directories and are reused in subsequent launches.
 
 In this setup, you can dynamically specify different world files by changing the `world_name` argument in the launch command.
