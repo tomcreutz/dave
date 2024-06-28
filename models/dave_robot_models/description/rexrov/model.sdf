@@ -4,7 +4,7 @@
 
     <link name="base_link">
       <inertial>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 -0.59 0 0 0</pose>
         <mass>1862.87</mass>
         <inertia>
           <ixx>525.39</ixx>
@@ -30,7 +30,9 @@
       <collision name="bottom_plate">
         <pose>0 0 -0.75 0 0 0</pose>
         <geometry>
-          <box size="2.56 1.50 0.10"/>
+          <box>
+            <size>2.56 1.50 0.10</size>
+          </box>
         </geometry>
       </collision>
 
@@ -38,7 +40,9 @@
       <collision name="top_plate">
         <pose>0 0 0.60 0 0 0</pose>
         <geometry>
-          <box size="2.56 1.50 0.40"/>
+          <box>
+            <size>2.56 1.50 0.40</size>
+          </box>
         </geometry>
       </collision>
 
@@ -46,30 +50,41 @@
       <collision name="left_side">
         <pose>-0.20 0.70 -0.15 0 0 0</pose>
         <geometry>
-          <box size="2.20 0.10 1.10"/>
+          <box>
+            <size>2.20 0.10 1.10</size>
+          </box>
         </geometry>
       </collision>
 
       <collision name="right_side">
         <pose>0.20 -0.70 -0.15 0 0 0</pose>
         <geometry>
-          <box size="2.20 0.10 1.10"/>
+          <box>
+            <size>2.20 0.10 1.10</size>
+          </box>
         </geometry>
       </collision>
+
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>1000.0</update_rate>
+        <topic>imu</topic>
+      </sensor>
+
     </link>
 
     <link name="thruster1">
       <pose>-0.890895 0.334385 0.528822 0 -1.300794 -0.928689</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -81,7 +96,10 @@
       </visual>
       <collision name="thruster1_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -90,15 +108,15 @@
     <link name="thruster2">
       <pose>-0.890895 -0.334385 0.528822 0 -1.300794 0.928689</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -110,7 +128,10 @@
       </visual>
       <collision name="thruster2_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -119,15 +140,15 @@
     <link name="thruster3">
       <pose>0.890895 0.334385 0.528822 0 -1.840798 0.928689</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -139,7 +160,10 @@
       </visual>
       <collision name="thruster3_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -148,15 +172,15 @@
     <link name="thruster4">
       <pose>0.890895 -0.334385 0.528822 0 -1.300794 -0.928689</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -168,7 +192,10 @@
       </visual>
       <collision name="thruster4_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -177,15 +204,15 @@
     <link name="thruster5">
       <pose>-0.412125 0.505415 0.129 0 0 0.785398</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -197,7 +224,10 @@
       </visual>
       <collision name="thruster5_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -206,15 +236,15 @@
     <link name="thruster6">
       <pose>-0.412125 -0.505415 0.129 0 0 -0.785398</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -226,7 +256,10 @@
       </visual>
       <collision name="thruster6_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -235,15 +268,15 @@
     <link name="thruster7">
       <pose>0.412125 0.505415 0.129 0 0 2.356194</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -255,7 +288,10 @@
       </visual>
       <collision name="thruster7_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -264,15 +300,15 @@
     <link name="thruster8">
       <pose>0.412125 -0.505415 0.129 0 0 -2.356194</pose>
       <inertial>
-        <mass value="0.001" />
-        <inertia
+        <mass>0.001</mass>
+        <inertia>
           ixx="0.0005"
           ixy="0"
           ixz="0"
           iyy="0.0005"
           iyz="0"
           izz="0.0005"
-        />
+        </inertia>
       </inertial>
       <visual name="prop_mesh_file">
         <geometry>
@@ -284,7 +320,10 @@
       </visual>
       <collision name="thruster8_collision">
         <geometry>
-          <cylinder length="0.000001" radius="0.000001"/>
+          <cylinder>
+            <length>0.000001</length>
+            <radius>0.000001</radius>
+          </cylinder>
         </geometry>
         <pose>0 0 0 0 0 0</pose>
       </collision>
@@ -294,64 +333,104 @@
       <pose>-0.890895 0.334385 0.528822 0 -1.300794 -0.928689</pose>
       <parent>base_link</parent>
       <child>thruster1</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <joint name="thruster2_joint" type="revolute">
       <pose>-0.890895 -0.334385 0.528822 0 -1.300794 0.928689</pose>
       <parent>base_link</parent>
       <child>thruster2</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <joint name="thruster3_joint" type="revolute">
       <pose>0.890895 0.334385 0.528822 0 -1.840798 0.928689</pose>
       <parent>base_link</parent>
       <child>thruster3</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <joint name="thruster4_joint" type="revolute">
       <pose>0.890895 -0.334385 0.528822 0 -1.300794 -0.928689</pose>
       <parent>base_link</parent>
       <child>thruster4</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <joint name="thruster5_joint" type="revolute">
       <pose>-0.412125 0.505415 0.129 0 0 0.785398</pose>
       <parent>base_link</parent>
       <child>thruster5</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <joint name="thruster6_joint" type="revolute">
       <pose>-0.412125 -0.505415 0.129 0 0 -0.785398</pose>
       <parent>base_link</parent>
       <child>thruster6</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <joint name="thruster7_joint" type="revolute">
       <pose>0.412125 0.505415 0.129 0 0 2.356194</pose>
       <parent>base_link</parent>
       <child>thruster7</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <joint name="thruster8_joint" type="revolute">
       <pose>0.412125 -0.505415 0.129 0 0 -2.356194</pose>
       <parent>base_link</parent>
       <child>thruster8</child>
-      <axis xyz="1 0 0" />
-      <limits effort="-1" velocity="-1" />
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+      </axis>
     </joint>
 
     <plugin
@@ -447,12 +526,13 @@
       name="gz::sim::systems::Hydrodynamics">
       <link_name>base_link</link_name>
       <!-- Added mass -->
-      <xDotU>0</xDotU>
-      <yDotV>0</yDotV>
-      <zDotW>0</zDotW>
+      <!-- Using values of LRAUV -->
+      <xDotU>-4.876161</xDotU>
+      <yDotV>-126.324739</yDotV>
+      <zDotW>-126.324739</zDotW>
       <kDotP>0</kDotP>
-      <mDotQ>0</mDotQ>
-      <nDotR>0</nDotR>
+      <mDotQ>-33.46</mDotQ>
+      <nDotR>-33.46</nDotR>
       <!-- <xDotU>779.79</xDotU>
       <yDotV>1222</yDotV>
       <zDotW>3659.9</zDotW>
@@ -490,12 +570,6 @@
       <dimensions>3</dimensions>
       <odom_publish_frequency>100</odom_publish_frequency>
     </plugin>
-
-    <sensor name="imu_sensor" type="imu">
-      <always_on>true</always_on>
-      <update_rate>1000.0</update_rate>
-      <topic>imu</topic>
-    </sensor>
 
     <plugin
       filename="gz-sim-joint-state-publisher-system"
