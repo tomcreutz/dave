@@ -143,6 +143,9 @@ RUN mkdir -p /home/docker/.config/autostart && \
     printf "\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic\n\n\n\\033[0m" \
     >> ~/.hi
 
+# Remove sudo message
+RUN touch /home/docker/.sudo_as_admin_successful
+
 # Autostart terminal
 # hadolint ignore=SC3037
 RUN echo "[Desktop Entry]\nType=Application" \

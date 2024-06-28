@@ -108,7 +108,8 @@
           <near>0.25</near>
           <far>25000</far>
         </camera_clip>
-      </plugin>
+</plugin>
+
 
       <!-- Plugins that add functionality to the scene -->
       <plugin filename="EntityContextMenuPlugin" name="Entity context menu">

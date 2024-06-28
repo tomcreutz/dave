@@ -31,21 +31,25 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-added-large-files
+        args: ["--maxkb=2000"]
       - id: check-ast
       - id: check-case-conflict
       - id: check-docstring-first
       - id: check-merge-conflict
       - id: check-symlinks
       - id: debug-statements
-      - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: trailing-whitespace
         exclude_types: [rst]
       - id: fix-byte-order-marker
+      - id: check-yaml
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: requirements-txt-fixer
 
   # Python hooks
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.2
+    rev: v3.16.0
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
@@ -65,14 +69,14 @@ repos:
         args: ["--line-length=99", "--exclude=tools/code_check"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.0
     hooks:
       - id: flake8
         args: ["--extend-ignore=E501", "--exclude=tools/code_check"]
 
   # CPP hooks
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.5
+    rev: v18.1.7
     hooks:
       - id: clang-format
         args: ["-fallback-style=none", "-i"]
@@ -103,8 +107,10 @@ repos:
         name: ament_lint_cmake
         description: Check format of CMakeLists.txt files.
         entry: ament_lint_cmake
-        language: system
+        additional_dependencies: [ament-lint-cmake-py]
         files: CMakeLists\.txt$
+        language: python
+        types: [file]
 
   # Copyright (exclude for now, doesn't exist for nobel
   # https://packages.ubuntu.com/search?keywords=ament+copyright&searchon=names)
@@ -144,7 +150,7 @@ repos:
 
   # Json lint
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.4
+    rev: 0.28.6
     hooks:
       - id: check-github-workflows
         args: ["--verbose"]
@@ -154,19 +160,27 @@ repos:
         args: ["--verbose"]
 
   # XML lint for xacro, urdf, and sdf files
-  - repo: local
+  - repo: https://github.com/pamoller/xmlformatter
+    rev: v0.2.6
     hooks:
-      - id: xml-lint-robot-files
-        name: xml-lint-robot-files
+      - id: xml-formatter
+        name: Format XML
         description: Lint XML syntax in xacro, urdf, and sdf files.
-        entry: xmllint --noout
-        language: system
-        types: [text]
-        files: \.(xacro|urdf|sdf|xml|launch)$
+        language: python
+        types: [xml]
+        entry: xmlformat
+        args:
+          - "--overwrite"
+        files: '\.(xacro|urdf|sdf|xml|launch|world)$'
 
-  - repo: https://github.com/turo/pre-commit-hooks
-    rev: v3.5.0
-    hooks:
-      - id: docker-lint
-        files: \.dockerfile
-      - id: docker-compose-lint
+  # Not using dockerfile lint for now
+  # - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
+  #   rev: v0.1.0
+  #   hooks:
+  #     - id: dockerfilelint
+  #       files: \.dockerfile
+  # - repo: https://github.com/hadolint/hadolint
+  #   rev: v2.12.0  # Use the revision rev you want to point at
+  #   hooks:
+  #     - id: hadolint
+  #       files: \*.dockerfile
