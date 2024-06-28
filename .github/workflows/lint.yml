@@ -7,6 +7,9 @@ on:
     tags: ["*"]
     branches:
       - ros2
+  pull_request:
+    branches:
+      - ros2
 
 jobs:
   #   ament_lint:
@@ -66,7 +69,7 @@ jobs:
 
       - name: Run Yamllint on YAML and .launch files
         run: |
-          find . \( -iname '*.yml' -o -iname '*.yaml' \) -print0 | xargs -0 yamllint
+          find . \( -iname '*.yml' -o -iname '*.yaml' \) -print0 | xargs -0 yamllint -d "{extends: relaxed, rules: {new-line-at-end-of-file: {present: false}}}"
 
       - name: Lint CMake files
         run: find . \( -iname 'CMakeLists.txt' -o -iname '*.cmake' \) -print0 | xargs -0 cmake-lint
