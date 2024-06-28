@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.5">
+<sdf version="1.7">
   <include>
     <name>mossy_cinder_block</name>
     <pose>0 0 0 0 0 0</pose>

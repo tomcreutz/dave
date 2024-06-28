@@ -8,14 +8,14 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    model_name = LaunchConfiguration("model_name")
+    object_name = LaunchConfiguration("object_name")
     use_sim = LaunchConfiguration("use_sim")
 
     args = [
         DeclareLaunchArgument(
-            "model_name",
+            "object_name",
             default_value="model",
-            description="Name of the model to load",
+            description="Name of the object model to load",
         ),
         DeclareLaunchArgument(
             "use_sim",
@@ -28,7 +28,7 @@ def generate_launch_description():
         [
             FindPackageShare("dave_object_models"),
             "description",
-            model_name,
+            object_name,
             "model.sdf",
         ]
     )
@@ -36,7 +36,7 @@ def generate_launch_description():
     gz_spawner = Node(
         package="ros_gz_sim",
         executable="create",
-        arguments=["-name", model_name, "-file", description_file],
+        arguments=["-name", object_name, "-file", description_file],
         output="both",
         condition=IfCondition(use_sim),
         parameters=[{"use_sim_time": use_sim}],
