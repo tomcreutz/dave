@@ -45,7 +45,7 @@ repos:
 
   # Python hooks
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.2
+    rev: v3.16.0
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
@@ -65,14 +65,14 @@ repos:
         args: ["--line-length=99", "--exclude=tools/code_check"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.0
     hooks:
       - id: flake8
         args: ["--extend-ignore=E501", "--exclude=tools/code_check"]
 
   # CPP hooks
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.5
+    rev: v18.1.7
     hooks:
       - id: clang-format
         args: ["-fallback-style=none", "-i"]
@@ -103,8 +103,11 @@ repos:
         name: ament_lint_cmake
         description: Check format of CMakeLists.txt files.
         entry: ament_lint_cmake
+        additional_dependencies: [ament-lint-cmake-py]
         language: system
         files: CMakeLists\.txt$
+        language: python
+        types: [python]
 
   # Copyright (exclude for now, doesn't exist for nobel
   # https://packages.ubuntu.com/search?keywords=ament+copyright&searchon=names)
@@ -144,7 +147,7 @@ repos:
 
   # Json lint
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.4
+    rev: 0.28.6
     hooks:
       - id: check-github-workflows
         args: ["--verbose"]
@@ -154,18 +157,19 @@ repos:
         args: ["--verbose"]
 
   # XML lint for xacro, urdf, and sdf files
-  - repo: local
+  - repo: https://github.com/lsst-ts/pre-commit-xmllint
+    rev: v1.0.0
     hooks:
-      - id: xml-lint-robot-files
+      - id: format-xmllint
         name: xml-lint-robot-files
         description: Lint XML syntax in xacro, urdf, and sdf files.
-        entry: xmllint --noout
-        language: system
+        entry: check-xmllint
+        # language: system
         types: [text]
         files: \.(xacro|urdf|sdf|xml|launch)$
 
   - repo: https://github.com/turo/pre-commit-hooks
-    rev: v3.5.0
+    rev: v4.0.0  # You may version pin this if desired
     hooks:
       - id: docker-lint
         files: \.dockerfile
