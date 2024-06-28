@@ -42,7 +42,6 @@ repos:
       - id: trailing-whitespace
         exclude_types: [rst]
       - id: fix-byte-order-marker
-      - id: check-yaml
       - id: destroyed-symlinks
       - id: detect-private-key
       - id: requirements-txt-fixer
@@ -173,14 +172,21 @@ repos:
           - "--overwrite"
         files: '\.(xacro|urdf|sdf|xml|launch|world)$'
 
-  # Not using dockerfile lint for now
-  # - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
-  #   rev: v0.1.0
-  #   hooks:
-  #     - id: dockerfilelint
-  #       files: \.dockerfile
-  # - repo: https://github.com/hadolint/hadolint
-  #   rev: v2.12.0  # Use the revision rev you want to point at
-  #   hooks:
-  #     - id: hadolint
-  #       files: \*.dockerfile
+  # Yaml lint
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        name: yamllint
+        description: This hook runs yamllint.
+        entry: >
+          yamllint -d "{
+            extends: default,
+            rules: {
+              line-length: {max: 120},
+              new-line-at-end-of-file: disable
+            }
+          }"
+        language: python
+        types: [file, yaml]
+        files: '\.(yaml|yml)$'

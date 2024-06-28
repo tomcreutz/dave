@@ -59,14 +59,20 @@ jobs:
       - name: Run XML Linter for URDF, SDF, Xacro, XML files
         run: |
           find . \( -iname '*.urdf' -o -iname '*.sdf' -o -iname '*.xacro' \
-          -o -iname '*.xml'  -o -iname '*.launch' \) -print0 | xargs -0 xmllint --noout
+          -o -iname '*.xml' -o -iname '*.launch' -o -iname '*.world' \) -print0 | xargs -0 xmllint --noout
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
 
       - name: Run Yamllint on YAML and .launch files
         run: |
-          find . \( -iname '*.yml' -o -iname '*.yaml' \) -print0 | xargs -0 yamllint
+            find . \( -iname '*.yml' -o -iname '*.yaml' \) -print0 | xargs -0 yamllint -d "{
+                extends: default,
+                rules: {
+                    line-length: {max: 120},
+                    new-line-at-end-of-file: disable
+                }
+            }"
 
       - name: Lint CMake files
         run: find . \( -iname 'CMakeLists.txt' -o -iname '*.cmake' \) -print0 | xargs -0 cmake-lint
