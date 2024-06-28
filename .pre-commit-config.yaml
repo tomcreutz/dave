@@ -31,17 +31,21 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-added-large-files
+        args: ["--maxkb=2000"]
       - id: check-ast
       - id: check-case-conflict
       - id: check-docstring-first
       - id: check-merge-conflict
       - id: check-symlinks
       - id: debug-statements
-      - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: trailing-whitespace
         exclude_types: [rst]
       - id: fix-byte-order-marker
+      - id: check-yaml
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: requirements-txt-fixer
 
   # Python hooks
   - repo: https://github.com/asottile/pyupgrade
@@ -104,10 +108,9 @@ repos:
         description: Check format of CMakeLists.txt files.
         entry: ament_lint_cmake
         additional_dependencies: [ament-lint-cmake-py]
-        language: system
         files: CMakeLists\.txt$
         language: python
-        types: [python]
+        types: [file]
 
   # Copyright (exclude for now, doesn't exist for nobel
   # https://packages.ubuntu.com/search?keywords=ament+copyright&searchon=names)
@@ -157,16 +160,18 @@ repos:
         args: ["--verbose"]
 
   # XML lint for xacro, urdf, and sdf files
-  - repo: https://github.com/lsst-ts/pre-commit-xmllint
-    rev: v1.0.0
+  - repo: https://github.com/pamoller/xmlformatter
+    rev: v0.2.6
     hooks:
-      - id: format-xmllint
-        name: xml-lint-robot-files
+      - id: xml-formatter
+        name: Format XML
         description: Lint XML syntax in xacro, urdf, and sdf files.
-        entry: check-xmllint
-        # language: system
-        types: [text]
-        files: \.(xacro|urdf|sdf|xml|launch)$
+        language: python
+        types: [xml]
+        entry: xmlformat
+        args:
+          - "--overwrite"
+        files: '\.(xacro|urdf|sdf|xml|launch|world)$'
 
   - repo: https://github.com/turo/pre-commit-hooks
     rev: v4.0.0  # You may version pin this if desired
