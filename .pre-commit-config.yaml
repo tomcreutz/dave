@@ -173,9 +173,14 @@ repos:
           - "--overwrite"
         files: '\.(xacro|urdf|sdf|xml|launch|world)$'
 
-  - repo: https://github.com/turo/pre-commit-hooks
-    rev: v4.0.0  # You may version pin this if desired
-    hooks:
-      - id: docker-lint
-        files: \.dockerfile
-      - id: docker-compose-lint
+  # Not using dockerfile lint for now
+  # - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
+  #   rev: v0.1.0
+  #   hooks:
+  #     - id: dockerfilelint
+  #       files: \.dockerfile
+  # - repo: https://github.com/hadolint/hadolint
+  #   rev: v2.12.0  # Use the revision rev you want to point at
+  #   hooks:
+  #     - id: hadolint
+  #       files: \*.dockerfile
