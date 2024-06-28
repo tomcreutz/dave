@@ -83,12 +83,12 @@
       <cast_shadows>false</cast_shadows>
     </light>
 
-    <!-- NED Frame for world -->
+    <!-- North-East-Down Frame for world -->
     <include>
       <uri>https://fuel.gazebosim.org/1.0/hmoyen/models/North-East-Down frame</uri>
       <pose>0 0 0 0 0 0</pose>
     </include>
-    
+
     <!-- Sea surface -->
     <include>
       <uri>
@@ -101,6 +101,6 @@
       <uri>https://fuel.gazebosim.org/1.0/hmoyen/models/Sand Heightmap</uri>
       <pose>0 0 -95 0 0 0</pose>
     </include>
-  
+
   </world>
 </sdf>
