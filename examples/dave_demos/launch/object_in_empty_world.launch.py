@@ -8,7 +8,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     use_sim = LaunchConfiguration("use_sim")
-    model_name = LaunchConfiguration("model_name")
+    object_name = LaunchConfiguration("object_name")
     gazebo_world_file = LaunchConfiguration("gazebo_world_file")
 
     # Declare the launch arguments with default values
@@ -24,9 +24,9 @@ def generate_launch_description():
             description="Flag to indicate whether to use simulation",
         ),
         DeclareLaunchArgument(
-            "model_name",
+            "object_name",
             default_value="mossy_cinder_block",
-            description="Name of the model to load",
+            description="Name of the object model to load",
         ),
     ]
 
@@ -63,13 +63,13 @@ def generate_launch_description():
                     [
                         FindPackageShare("dave_object_models"),
                         "launch",
-                        "upload_model.launch.py",
+                        "upload_object.launch.py",
                     ]
                 )
             ]
         ),
         launch_arguments={
-            "model_name": model_name,
+            "object_name": object_name,
             "use_sim": use_sim,
         }.items(),
     )
