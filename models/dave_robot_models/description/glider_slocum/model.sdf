@@ -70,24 +70,21 @@
       <child>battery_link</child>
     </joint>
 
-    <!-- <plugin
+    <plugin
       filename="gz-sim-linearbatteryplugin-system"
       name="gz::sim::systems::LinearBatteryPlugin">
       <battery_name>battery</battery_name>
       <voltage>4.2</voltage>
       <open_circuit_voltage_constant_coef>3.7</open_circuit_voltage_constant_coef>
       <open_circuit_voltage_linear_coef>-3.1424</open_circuit_voltage_linear_coef>
-      <initial_charge>1.1665</initial_charge>
-      <capacity>0.5 </capacity>
+      <initial_charge>4.32</initial_charge>
+      <capacity>4.8</capacity>
       <resistance>0.002</resistance>
       <smooth_current_tau>1.9499</smooth_current_tau>
       <enable_recharge>false</enable_recharge>
-      <power_load></power_load>
+      <power_load>10</power_load>
       <start_on_motion>true</start_on_motion>
-      <start_draining>false</start_draining>
-      <start_power_draining_topic>glider_slocum/start_battery_drain</start_power_draining_topic>
-      <stop_power_draining_topic>glider_slocum/stop_battery_drain</stop_power_draining_topic>
-    </plugin> -->
+    </plugin>
 
     <link name="propeller_link">
       <visual name="propeller_link_visual">
