@@ -27,5 +27,5 @@ ros2 launch dave_robot_launch robot_in_world.launch.py z:=0.2 namespace:=glider_
 ### 4. Launching Slocum Glider in dave_ocean_waves.world
 
 ```bash
-ros2 launch dave_robot_launch robot_in_world.launch.py z:=-2.5 namespace:=glider_slocum world_name:=dave_ocean_waves paused:=false
+ros2 launch dave_robot_launch robot_in_world.launch.py x:=4 z:=-1.5 namespace:=glider_slocum world_name:=dave_ocean_waves paused:=false
 ```
