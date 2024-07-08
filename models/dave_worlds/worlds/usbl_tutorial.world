@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- <include filename="ground_plane.model"/>
+         <include filename="sun.light"/> -->
+    <include>
+        <uri>
+    https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane
+        </uri>
+    </include>
+
+    <include>
+        <uri>
+    https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun
+        </uri>
+    </include>
+
+    <model name="box">
+      <pose>0 0 0.5 0 0 0</pose>
+      <link name="box_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+    <plugin
+      filename="UsblTransceiver"
+      name="dave_model_systems::UsblTransceiver">
+      <namespace>USBL</namespace>
+      <transceiver_device>transceiver_manufacturer</transceiver_device>
+      <transponder_device>transponder_manufacturer</transponder_device>
+	  <transponder_ID>1,2</transponder_ID>
+      <transceiver_ID>168</transceiver_ID>
+      <enable_ping_scheduler>false</enable_ping_scheduler>
+      <transponder_attached_object>sphere</transponder_attached_object>
+    </plugin>
+    </model>
+
+    <model name="sphere">
+      <pose>3 3 0.5 0 0 0</pose>
+      <link name="sphere_link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    <plugin
+    filename="UsblTransponder"
+    name="dave_model_systems::UsblTransponder">
+	<namespace>USBL</namespace>
+	<transponder_device>transponder_manufacturer</transponder_device>
+	<transponder_ID>1</transponder_ID>
+	<transceiver_device>transceiver_manufacturer</transceiver_device>
+	<transceiver_ID>168</transceiver_ID>
+	<mu>0</mu>
+	<sigma>0.0</sigma>
+      </plugin>
+
+    </model>
+  </world>
+</sdf>
