@@ -39,6 +39,10 @@ sudo apt install -y \
 echo
 echo -e "\033[96m(3/4) ------------    Install Package Keys   ---------------\033[0m"
 echo -e "\033[34mInstalling Signing Keys for ROS and Gazebo...\033[0m"
+# Remove keyring if exists to avoid conflicts
+sudo rm -f /usr/share/keyrings/ros2-latest-archive-keyring.gpg && \
+    sudo rm -rf /etc/apt/sources.list.d/ros2-latest.list
+# Get Keys
 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
     -o /usr/share/keyrings/ros-archive-keyring.gpg
 sudo wget https://packages.osrfoundation.org/gazebo.gpg \
