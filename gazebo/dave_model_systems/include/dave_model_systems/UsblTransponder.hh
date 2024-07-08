@@ -24,7 +24,10 @@
 #include <gz/sim/System.hh>
 
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <std_msgs/msg/string.hpp>
+#include "dave_interfaces/msg/usbl_command.hpp"
+#include "dave_interfaces/msg/usbl_response.hpp"
 
 namespace dave_model_systems
 
@@ -44,7 +47,11 @@ public:
   void PostUpdate(
     const gz::sim::UpdateInfo & info, const gz::sim::EntityComponentManager & ecm) override;
 
-  void sendLocation(const gz::sim::EntityComponentManager & _ecm);
+  void sendLocation();
+  void iisRosCallback(const std_msgs::msg::String::SharedPtr msg);
+  void temperatureRosCallback(const std_msgs::msg::Float64::SharedPtr msg);
+  void cisRosCallback(const std_msgs::msg::String::SharedPtr msg);
+  void commandRosCallback(const dave_interfaces::msg::UsblCommand msg);
 
 private:
   std::shared_ptr<rclcpp::Node> ros_node_;

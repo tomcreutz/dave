@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(gz-common5 REQUIRED COMPONENTS profiler)
 find_package(gz-sim8 REQUIRED)
+find_package(dave_interfaces REQUIRED)
 
 # Set version variables
 set(GZ_PLUGIN_VER ${gz-plugin2_VERSION_MAJOR})
@@ -57,15 +58,16 @@ ament_target_dependencies(FullSystem
 
 # Specify dependencies for FullSystem using ament_target_dependencies
 ament_target_dependencies(UsblTransceiver
+  dave_interfaces
   rclcpp
   std_msgs
 )
 
 ament_target_dependencies(UsblTransponder
+  dave_interfaces
   rclcpp
   std_msgs
 )
-
 
 # Install targets
 install(TARGETS BasicSystem FullSystem UsblTransceiver UsblTransponder

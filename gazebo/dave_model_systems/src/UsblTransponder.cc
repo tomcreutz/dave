@@ -30,6 +30,8 @@
 #include <gz/sim/components/Name.hh>
 #include <gz/sim/components/ParentEntity.hh>
 #include <gz/transport/Node.hh>
+#include "gz/sim/components/Model.hh"
+#include "gz/sim/components/World.hh"
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
@@ -38,6 +40,7 @@
 
 // Available interrogation modes
 std::vector<std::string> im = {"common", "individual"};
+using std::placeholders::_1;
 
 GZ_ADD_PLUGIN(
   dave_model_systems::UsblTransponder, gz::sim::System,
@@ -51,7 +54,10 @@ struct UsblTransponder::PrivateData
 {
   // Add any private data members here.
   gz::sim::Model model;
+  gz::sim::Entity transceiverEntity;
+  gz::sim::EntityComponentManager * ecm;
   std::string modelName;
+  std::string m_transceiverModelName;
   std::string ns;  // 'namespace' is a reserved word in C++, using 'ns' instead.
   std::string m_transceiverDevice;
   std::string m_transceiverID;
@@ -62,17 +68,20 @@ struct UsblTransponder::PrivateData
   gz::transport::Node m_gzNode;
   gz::transport::Node::Publisher m_globalPosPub;
   gz::sim::Entity linkEntity;
+  rclcpp::Publisher<dave_interfaces::msg::UsblResponse>::SharedPtr m_commandResponsePub;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_iisSub;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_cisSub;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr m_temperatureSub;
+  rclcpp::Subscription<dave_interfaces::msg::UsblCommand>::SharedPtr m_commandSub;
+  double m_soundSpeed;
+  double m_temperature;
 };
 
 UsblTransponder::UsblTransponder() : dataPtr(std::make_unique<PrivateData>())
 {
-  if (!rclcpp::ok())
-  {
-    rclcpp::init(0, nullptr);
-  }
-
-  this->ros_node_ = std::make_shared<rclcpp::Node>("usbl_transponder_node");
-  this->log_pub_ = this->ros_node_->create_publisher<std_msgs::msg::String>("/transponder", 10);
+  dataPtr->m_temperature = 10.0;  // Default initialization
+  dataPtr->m_noiseSigma = 0.0;    // Default initialization
+  dataPtr->m_noiseMu = 0.0;       // Default initialization
 }
 
 void UsblTransponder::Configure(
@@ -80,6 +89,15 @@ void UsblTransponder::Configure(
   gz::sim::EntityComponentManager & _ecm, gz::sim::EventManager & _eventManager)
 {
   gzdbg << "dave_model_systems::UsblTransponder::Configure on entity: " << _entity << std::endl;
+
+  if (!rclcpp::ok())
+  {
+    rclcpp::init(0, nullptr);
+  }
+
+  this->ros_node_ = std::make_shared<rclcpp::Node>("usbl_transponder_node");
+  this->dataPtr->ecm = &_ecm;
+  this->log_pub_ = this->ros_node_->create_publisher<std_msgs::msg::String>("/transponder", 10);
 
   std_msgs::msg::String msg;
   msg.data = "dave_model_systems::UsblTransponder::Configure on entity: " + std::to_string(_entity);
@@ -172,20 +190,63 @@ void UsblTransponder::Configure(
     this->dataPtr->m_noiseSigma = _sdf->Get<double>("sigma");
   }
 
+  // Get transceiver model name
+  if (!_sdf->HasElement("transceiver_model"))
+  {
+    gzerr << "Missing required parameter <transceiver_model>, "
+          << "plugin will not be initialized." << std::endl;
+    return;
+  }
+  this->dataPtr->m_transceiverModelName = _sdf->Get<std::string>("transceiver_model");
+  gzmsg << "Transceiver model: " << this->dataPtr->m_transceiverModelName << std::endl;
+
+  auto worldEntity = _ecm.EntityByComponents(gz::sim::components::World());
+  this->dataPtr->transceiverEntity = _ecm.EntityByComponents(
+    gz::sim::components::Name(this->dataPtr->m_transceiverModelName), gz::sim::components::Model());
+  // this->dataPtr->transceiverModel = worldEntity.ModelByName(_ecm,
+  // this->dataPtr->transceiverModelName);
+
   // Define Gazebo publisher for entity's global position
   this->dataPtr->m_globalPosPub = this->dataPtr->m_gzNode.Advertise<gz::msgs::Vector3d>(
     "/" + this->dataPtr->ns + "/" + this->dataPtr->m_transceiverDevice + "_" +
     this->dataPtr->m_transponderID + "/global_position");
+
+  std::string commandResponseTopic(
+    "/" + this->dataPtr->ns + "/" + this->dataPtr->m_transceiverDevice + "_" +
+    this->dataPtr->m_transceiverID + "/command_response");
+
+  this->dataPtr->m_commandResponsePub =
+    this->ros_node_->create_publisher<dave_interfaces::msg::UsblResponse>(commandResponseTopic, 1);
+
+  this->dataPtr->m_iisSub = this->ros_node_->create_subscription<std_msgs::msg::String>(
+    "/" + this->dataPtr->ns + "/" + this->dataPtr->m_transponderDevice + "_" +
+      this->dataPtr->m_transponderID + "/individual_interrogation_ping",
+    1, std::bind(&UsblTransponder::iisRosCallback, this, _1));
+
+  this->dataPtr->m_cisSub = this->ros_node_->create_subscription<std_msgs::msg::String>(
+    "/" + this->dataPtr->ns + "/common_interrogation_ping", 1,
+    std::bind(&UsblTransponder::cisRosCallback, this, _1));
+
+  this->dataPtr->m_temperatureSub = this->ros_node_->create_subscription<std_msgs::msg::Float64>(
+    "/" + this->dataPtr->ns + "/" + this->dataPtr->m_transponderDevice + "_" +
+      this->dataPtr->m_transponderID + "/temperature",
+    1, std::bind(&UsblTransponder::temperatureRosCallback, this, _1));
+
+  this->dataPtr->m_commandSub =
+    this->ros_node_->create_subscription<dave_interfaces::msg::UsblCommand>(
+      "/" + this->dataPtr->ns + "/" + this->dataPtr->m_transponderDevice + "_" +
+        this->dataPtr->m_transponderID + "/command_request",
+      1, std::bind(&UsblTransponder::commandRosCallback, this, _1));
 }
 
-void UsblTransponder::sendLocation(const gz::sim::EntityComponentManager & _ecm)
+void UsblTransponder::sendLocation()
 {
   // randomly generate from normal distribution for noise
   std::random_device rd{};
   std::mt19937 gen{rd()};
   std::normal_distribution<> d(this->dataPtr->m_noiseMu, this->dataPtr->m_noiseSigma);
 
-  gz::math::Pose3d pose = worldPose(this->dataPtr->linkEntity, _ecm);
+  gz::math::Pose3d pose = worldPose(this->dataPtr->linkEntity, *this->dataPtr->ecm);
   gz::math::Vector3<double> position = pose.Pos();
   auto pub_msg = gz::msgs::Vector3d();
   // std::cout << position.X() << " " << position.Y() << " "
@@ -194,6 +255,87 @@ void UsblTransponder::sendLocation(const gz::sim::EntityComponentManager & _ecm)
   pub_msg.set_y(position.Y() + d(gen));
   pub_msg.set_z(position.Z() + d(gen));
   this->dataPtr->m_globalPosPub.Publish(pub_msg);
+}
+
+void UsblTransponder::iisRosCallback(const std_msgs::msg::String::SharedPtr msg)
+{
+  gz::math::Pose3d pose_transponder = worldPose(this->dataPtr->linkEntity, *this->dataPtr->ecm);
+  gz::math::Pose3d pose_transceiver =
+    worldPose(this->dataPtr->transceiverEntity, *this->dataPtr->ecm);
+  gz::math::Vector3<double> position_transponder = pose_transponder.Pos();
+  gz::math::Vector3<double> position_transceiver = pose_transceiver.Pos();
+
+  // For each kilometer increase in depth (pressure), the sound speed increases by 17 m/s
+  // Base on https://dosits.org/tutorials/science/tutorial-speed/
+  this->dataPtr->m_soundSpeed = 1540.4 + position_transponder.Z() / 1000 * 17;
+  double dist = (position_transponder - position_transceiver).Length();
+  std::string command = msg->data;
+
+  if (!command.compare("ping"))
+  {
+    gzmsg << this->dataPtr->m_transponderDevice + "_" + this->dataPtr->m_transponderID +
+               ": Received iis_ping, responding\n";
+    gzmsg << "Distance " << dist << std::endl;
+    gzmsg << "Pose transponder " << position_transponder << std::endl;
+    gzmsg << "Pose transceiver " << position_transceiver << std::endl;
+    sleep(dist / this->dataPtr->m_soundSpeed);
+    sendLocation();
+  }
+  else
+  {
+    gzmsg << "Unknown command, ignore\n";
+  }
+}
+
+void UsblTransponder::cisRosCallback(const std_msgs::msg::String::SharedPtr msg)
+{
+  gz::math::Pose3d pose_transponder = worldPose(this->dataPtr->linkEntity, *this->dataPtr->ecm);
+  gz::math::Pose3d pose_transceiver =
+    worldPose(this->dataPtr->transceiverEntity, *this->dataPtr->ecm);
+  gz::math::Vector3<double> position_transponder = pose_transponder.Pos();
+  gz::math::Vector3<double> position_transceiver = pose_transceiver.Pos();
+
+  // For each kilometer increase in depth (pressure), the sound speed increases by 17 m/s
+  // Base on https://dosits.org/tutorials/science/tutorial-speed/
+  this->dataPtr->m_soundSpeed = 1540.4 + position_transponder.Z() / 1000 * 17;
+  double dist = (position_transponder - position_transceiver).Length();
+  std::string command = msg->data;
+
+  if (!command.compare("ping"))
+  {
+    gzmsg << this->dataPtr->m_transponderDevice + "_" + this->dataPtr->m_transponderID +
+               ": Received cis_ping, responding\n";
+    sleep(dist / this->dataPtr->m_soundSpeed);
+    sendLocation();
+  }
+  else
+  {
+    gzmsg << "Unknown command, ignore\n";
+  }
+}
+
+void UsblTransponder::temperatureRosCallback(const std_msgs::msg::Float64::SharedPtr msg)
+{
+  gz::math::Pose3d pose_transponder = worldPose(this->dataPtr->linkEntity, *this->dataPtr->ecm);
+  gz::math::Vector3<double> position_transponder = pose_transponder.Pos();
+
+  this->dataPtr->m_temperature = msg->data;
+
+  // Base on https://dosits.org/tutorials/science/tutorial-speed/
+  this->dataPtr->m_soundSpeed =
+    1540.4 + position_transponder.Z() / 1000 * 17 + (this->dataPtr->m_temperature - 10) * 4;
+  gzmsg << "Detected change of temperature, transponder sound speed is now: "
+        << this->dataPtr->m_soundSpeed << " m/s\n";
+}
+
+void UsblTransponder::commandRosCallback(const dave_interfaces::msg::UsblCommand msg)
+{
+  dave_interfaces::msg::UsblResponse response_msg;
+  response_msg.data = "Hi from transponder_" + this->dataPtr->m_transponderID;
+  response_msg.response_id = 1;
+
+  response_msg.transceiver_id = this->dataPtr->m_transceiverID.back() - '0';
+  this->dataPtr->m_commandResponsePub->publish(response_msg);
 }
 
 void UsblTransponder::PostUpdate(
@@ -206,7 +348,7 @@ void UsblTransponder::PostUpdate(
     msg.data = "dave_model_systems::UsblTransponder::PostUpdate: namespace = " + this->dataPtr->ns +
                ", model name = " + this->dataPtr->modelName;
     this->log_pub_->publish(msg);
-    sendLocation(_ecm);
+    rclcpp::spin(this->ros_node_);
   }
 }
 

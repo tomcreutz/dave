@@ -49,7 +49,7 @@
     </model>
 
     <model name="sphere">
-      <pose>3 3 0.5 0 0 0</pose>
+      <pose>3 3 0 0 0 0</pose>
       <link name="sphere_link">
         <collision name="collision">
           <geometry>
@@ -75,6 +75,7 @@
 	<transponder_ID>1</transponder_ID>
 	<transceiver_device>transceiver_manufacturer</transceiver_device>
 	<transceiver_ID>168</transceiver_ID>
+  <transceiver_model>box</transceiver_model>
 	<mu>0</mu>
 	<sigma>0.0</sigma>
       </plugin>
