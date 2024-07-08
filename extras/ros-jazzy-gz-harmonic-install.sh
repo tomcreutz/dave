@@ -48,7 +48,7 @@ ARCH=$(dpkg --print-architecture)
 # shellcheck disable=SC1091
 UBUNTU_CODENAME=$( . /etc/os-release && echo "$UBUNTU_CODENAME")
 REPO="deb [arch=$ARCH signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] \
-http://packages.ros.org/ros2-testing/ubuntu $UBUNTU_CODENAME main"
+http://packages.ros.org/ros2/ubuntu $UBUNTU_CODENAME main"
 echo "$REPO" | sudo tee /etc/apt/sources.list.d/ros2.list >/dev/null
 
 DISTRO=$(lsb_release -cs)
