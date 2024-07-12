@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef DAVE_GZ_MODEL_PLUGINS__USBLTRANSPONDER_HH_
-#define DAVE_GZ_MODEL_PLUGINS__USBLTRANSPONDER_HH_
+#ifndef DAVE_GZ_SENSOR_PLUGINS__USBLTRANSPONDER_HH_
+#define DAVE_GZ_SENSOR_PLUGINS__USBLTRANSPONDER_HH_
 
 #include <memory>
 #include <string>
@@ -29,7 +29,7 @@
 #include "dave_interfaces/msg/usbl_command.hpp"
 #include "dave_interfaces/msg/usbl_response.hpp"
 
-namespace dave_gz_model_plugins
+namespace dave_gz_sensor_plugins
 
 {
 class UsblTransponder : public gz::sim::System,
@@ -60,6 +60,6 @@ private:
   struct PrivateData;
   std::unique_ptr<PrivateData> dataPtr;
 };
-}  // namespace dave_gz_model_plugins
+}  // namespace dave_gz_sensor_plugins
 
-#endif  // DAVE_GZ_MODEL_PLUGINS__USBLTRANSPONDER_HH_
+#endif  // DAVE_GZ_SENSOR_PLUGINS__USBLTRANSPONDER_HH_
