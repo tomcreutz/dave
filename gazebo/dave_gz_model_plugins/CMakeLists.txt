@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Define the project name
-project(dave_model_systems)
+project(dave_gz_model_plugins)
 
 # Find required packages
 find_package(ament_cmake REQUIRED)
