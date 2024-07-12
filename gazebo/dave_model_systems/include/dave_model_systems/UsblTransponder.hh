@@ -52,10 +52,10 @@ public:
   void temperatureRosCallback(const std_msgs::msg::Float64::SharedPtr msg);
   void cisRosCallback(const std_msgs::msg::String::SharedPtr msg);
   void commandRosCallback(const dave_interfaces::msg::UsblCommand msg);
+  void sendPing();
 
 private:
   std::shared_ptr<rclcpp::Node> ros_node_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr log_pub_;
 
   struct PrivateData;
   std::unique_ptr<PrivateData> dataPtr;

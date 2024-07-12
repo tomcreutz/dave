@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <gz/msgs/vector3d.pb.h>
 #include <algorithm>
 #include <random>
 #include <string>
@@ -38,8 +37,6 @@
 
 #include "dave_model_systems/UsblTransponder.hh"
 
-// Available interrogation modes
-std::vector<std::string> im = {"common", "individual"};
 using std::placeholders::_1;
 
 GZ_ADD_PLUGIN(
@@ -95,13 +92,7 @@ void UsblTransponder::Configure(
     rclcpp::init(0, nullptr);
   }
 
-  this->ros_node_ = std::make_shared<rclcpp::Node>("usbl_transponder_node");
   this->dataPtr->ecm = &_ecm;
-  this->log_pub_ = this->ros_node_->create_publisher<std_msgs::msg::String>("/transponder", 10);
-
-  std_msgs::msg::String msg;
-  msg.data = "dave_model_systems::UsblTransponder::Configure on entity: " + std::to_string(_entity);
-  this->log_pub_->publish(msg);
 
   auto model = gz::sim::Model(_entity);
   this->dataPtr->model = model;
@@ -177,6 +168,8 @@ void UsblTransponder::Configure(
     return;
   }
   this->dataPtr->m_transponderID = _sdf->Get<std::string>("transponder_ID");
+  this->ros_node_ =
+    std::make_shared<rclcpp::Node>("usbl_transponder_" + this->dataPtr->m_transponderID + "_node");
 
   // Get the mean of normal distribution for the noise model
   if (_sdf->HasElement("mu"))
@@ -341,14 +334,10 @@ void UsblTransponder::commandRosCallback(const dave_interfaces::msg::UsblCommand
 void UsblTransponder::PostUpdate(
   const gz::sim::UpdateInfo & _info, const gz::sim::EntityComponentManager & _ecm)
 {
-  if (!_info.paused && _info.iterations % 1000 == 0)
+  if (!_info.paused)
   {
-    gzdbg << "dave_model_systems::UsblTransponder::PostUpdate" << std::endl;
-    std_msgs::msg::String msg;
-    msg.data = "dave_model_systems::UsblTransponder::PostUpdate: namespace = " + this->dataPtr->ns +
-               ", model name = " + this->dataPtr->modelName;
-    this->log_pub_->publish(msg);
-    rclcpp::spin(this->ros_node_);
+    // gzdbg << "dave_model_systems::UsblTransponder::PostUpdate" << std::endl;
+    rclcpp::spin_some(this->ros_node_);
   }
 }
 

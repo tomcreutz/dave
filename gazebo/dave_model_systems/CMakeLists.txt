@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(gz-common5 REQUIRED COMPONENTS profiler)
 find_package(gz-sim8 REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(dave_interfaces REQUIRED)
 
 # Set version variables
@@ -60,6 +61,7 @@ ament_target_dependencies(FullSystem
 ament_target_dependencies(UsblTransceiver
   dave_interfaces
   rclcpp
+  geometry_msgs
   std_msgs
 )
 
