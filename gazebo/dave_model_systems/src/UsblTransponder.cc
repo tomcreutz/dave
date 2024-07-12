@@ -273,11 +273,11 @@ void UsblTransponder::iisRosCallback(const std_msgs::msg::String::SharedPtr msg)
 
   if (!command.compare("ping"))
   {
-    gzmsg << this->dataPtr->m_transponderDevice + "_" + this->dataPtr->m_transponderID +
-               ": Received iis_ping, responding\n";
-    gzmsg << "Distance " << dist << std::endl;
-    gzmsg << "Pose transponder " << position_transponder << std::endl;
-    gzmsg << "Pose transceiver " << position_transceiver << std::endl;
+    // gzmsg << this->dataPtr->m_transponderDevice + "_" + this->dataPtr->m_transponderID +
+    //            ": Received iis_ping, responding\n";
+    // gzmsg << "Distance " << dist << std::endl;
+    // gzmsg << "Pose transponder " << position_transponder << std::endl;
+    // gzmsg << "Pose transceiver " << position_transceiver << std::endl;
     sleep(dist / this->dataPtr->m_soundSpeed);
     sendLocation();
   }
