@@ -16,6 +16,7 @@
 
 #include <gz/msgs/vector3d.pb.h>
 #include <algorithm>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -23,6 +24,7 @@
 #include <gz/common/Console.hh>
 #include <gz/sim/Model.hh>
 #include <gz/sim/Util.hh>
+#include <gz/sim/World.hh>
 #include <gz/sim/components/Link.hh>
 #include <gz/sim/components/Name.hh>
 #include <gz/sim/components/ParentEntity.hh>
@@ -215,10 +217,8 @@ void UsblTransceiver::Configure(
 
   for (auto & object : transpondersObjects)
   {
-    gzmsg << object << std::endl;
     this->dataPtr->m_transponderAttachedObjects.push_back(object);
-    this->dataPtr->m_transponderEntities.push_back(
-      _ecm.EntityByComponents(gz::sim::components::Name(object), gz::sim::components::Model()));
+    gzmsg << "Added " << object << "to list of transponders objects" << std::endl;
   }
 
   /*  interrogation mode - 2 options
@@ -363,11 +363,16 @@ void UsblTransceiver::sendPing()
   std_msgs::msg::String ping_msg;
   ping_msg.data = "ping";
 
-  for (auto & transponder : this->dataPtr->m_transponderEntities)
+  for (auto & object : this->dataPtr->m_transponderAttachedObjects)
   {
+    auto transponder = this->dataPtr->ecm->EntityByComponents(
+      gz::sim::components::Name(object), gz::sim::components::Model());
+
     gz::math::Pose3d pose_transponder = worldPose(transponder, *this->dataPtr->ecm);
+    gzmsg << "Transponder pose" << pose_transponder << std::endl;
 
     gz::math::Pose3d pose_transceiver = worldPose(this->dataPtr->linkEntity, *this->dataPtr->ecm);
+    gzmsg << "Transceiver pose" << pose_transceiver << std::endl;
 
     double dist = (pose_transponder.Pos() - pose_transceiver.Pos()).Length();
     this->dataPtr->m_soundSpeed =
@@ -431,8 +436,8 @@ void UsblTransceiver::temperatureRosCallback(const std_msgs::msg::Float64::Share
 
 void UsblTransceiver::receiveGazeboCallback(const gz::msgs::Vector3d & transponder_position)
 {
-  gzmsg << "Transceiver acquires transponders position: " << transponder_position.x() << " "
-        << transponder_position.y() << " " << transponder_position.z() << std::endl;
+  // gzmsg << "Transceiver acquires transponders position: " << transponder_position.x() << " "
+  //       << transponder_position.y() << " " << transponder_position.z() << std::endl;
 
   gz::math::Vector3<double> transponder_position_ign = gz::math::Vector3<double>(
     transponder_position.x(), transponder_position.y(), transponder_position.z());
@@ -455,11 +460,12 @@ void UsblTransceiver::publishPosition(double & bearing, double & range, double &
   location_cartesian.y = range * cos(elevation * M_PI / 180) * sin(bearing * M_PI / 180);
   location_cartesian.z = range * sin(elevation * M_PI / 180);
 
-  gzmsg << "Spherical Coordinate: \n\tBearing: " << location.x
-        << " degree(s)\n\tRange: " << location.y << " m\n\tElevation: " << location.z
-        << " degree(s)\n";
-  gzmsg << "Cartesian Coordinate: \n\tX: " << location_cartesian.x
-        << " m\n\tY: " << location_cartesian.y << " m\n\tZ: " << location_cartesian.z << " m\n\n";
+  // gzmsg << "Spherical Coordinate: \n\tBearing: " << location.x
+  //       << " degree(s)\n\tRange: " << location.y << " m\n\tElevation: " << location.z
+  //       << " degree(s)\n";
+  // gzmsg << "Cartesian Coordinate: \n\tX: " << location_cartesian.x
+  //       << " m\n\tY: " << location_cartesian.y << " m\n\tZ: " << location_cartesian.z << "
+  //       m\n\n";
 
   this->dataPtr->m_publishTransponderRelPos->publish(location);
   this->dataPtr->m_publishTransponderRelPosCartesian->publish(location_cartesian);
@@ -477,9 +483,9 @@ void UsblTransceiver::calcuateRelativePose(
     direction.X() * direction.X() + direction.Y() * direction.Y() + direction.Z() * direction.Z());
   elevation = asin(direction.Z() / direction.Length()) * 180 / M_PI;
 
-  gzmsg << "bearing: " << bearing << "\n";
-  gzmsg << "range: " << range << "\n";
-  gzmsg << "elevation: " << elevation << "\n\n";
+  // gzmsg << "bearing: " << bearing << "\n";
+  // gzmsg << "range: " << range << "\n";
+  // gzmsg << "elevation: " << elevation << "\n\n";
 }
 
 void UsblTransceiver::PostUpdate(
@@ -487,11 +493,12 @@ void UsblTransceiver::PostUpdate(
 {
   if (!_info.paused)
   {
-    // gzdbg << "dave_model_systems::UsblTransceiver::PostUpdate" << std::endl;
-
-    sendPing();
-
     rclcpp::spin_some(this->ros_node_);
+
+    if (_info.iterations % 1000 == 0)
+    {
+      sendPing();
+    }
   }
 }
 
