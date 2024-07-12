@@ -44,7 +44,7 @@
 	  <transponder_ID>1,2</transponder_ID>
       <transceiver_ID>168</transceiver_ID>
       <enable_ping_scheduler>false</enable_ping_scheduler>
-      <transponder_attached_object>sphere</transponder_attached_object>
+      <transponder_attached_object>sphere,sphere2</transponder_attached_object>
     </plugin>
     </model>
 
@@ -81,5 +81,43 @@
       </plugin>
 
     </model>
+
+
+  <model name="sphere2">
+      <pose>6 6 0 0 0 0</pose>
+      <link name="sphere2_link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    <plugin
+    filename="UsblTransponder"
+    name="dave_model_systems::UsblTransponder">
+	<namespace>USBL</namespace>
+	<transponder_device>transponder_manufacturer</transponder_device>
+	<transponder_ID>2</transponder_ID>
+	<transceiver_device>transceiver_manufacturer</transceiver_device>
+	<transceiver_ID>168</transceiver_ID>
+  <transceiver_model>box</transceiver_model>
+	<mu>0</mu>
+	<sigma>0.0</sigma>
+      </plugin>
+
+    </model>
+
+
+
   </world>
 </sdf>

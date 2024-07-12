@@ -18,12 +18,17 @@
 #ifndef DAVE_MODEL_SYSTEMS__USBLTRANSCEIVER_HH_
 #define DAVE_MODEL_SYSTEMS__USBLTRANSCEIVER_HH_
 
+#include <gz/msgs/vector3d.pb.h>
+#include <math.h>
 #include <memory>
 #include <string>
 
 #include <gz/sim/System.hh>
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <std_msgs/msg/string.hpp>
+#include "dave_interfaces/msg/usbl_command.hpp"
+#include "dave_interfaces/msg/usbl_response.hpp"
 
 namespace dave_model_systems
 
@@ -43,9 +48,20 @@ public:
   void PostUpdate(
     const gz::sim::UpdateInfo & info, const gz::sim::EntityComponentManager & ecm) override;
 
+  void receiveGazeboCallback(const gz::msgs::Vector3d & transponder_position);
+  void temperatureRosCallback(const std_msgs::msg::Float64::SharedPtr msg);
+  void interrogationModeRosCallback(const std_msgs::msg::String::SharedPtr msg);
+  void commandingResponseCallback(const dave_interfaces::msg::UsblResponse msg);
+  void channelSwitchCallback(const std_msgs::msg::String::SharedPtr msg);
+  void commandingResponseTestCallback(const std_msgs::msg::String::SharedPtr msg);
+  void sendCommand(int command_id, std::string & transponder_id);
+  void sendPing();
+  void calcuateRelativePose(
+    gz::math::Vector3<double> position, double & bearing, double & range, double & elevation);
+  void publishPosition(double & bearing, double & range, double & elevation);
+
 private:
   std::shared_ptr<rclcpp::Node> ros_node_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr log_pub_;
 
   struct PrivateData;
   std::unique_ptr<PrivateData> dataPtr;
