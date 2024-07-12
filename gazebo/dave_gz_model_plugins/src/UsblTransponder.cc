@@ -35,16 +35,16 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
 
-#include "dave_model_systems/UsblTransponder.hh"
+#include "dave_gz_model_plugins/UsblTransponder.hh"
 
 using std::placeholders::_1;
 
 GZ_ADD_PLUGIN(
-  dave_model_systems::UsblTransponder, gz::sim::System,
-  dave_model_systems::UsblTransponder::ISystemConfigure,
-  dave_model_systems::UsblTransponder::ISystemPostUpdate)
+  dave_gz_model_plugins::UsblTransponder, gz::sim::System,
+  dave_gz_model_plugins::UsblTransponder::ISystemConfigure,
+  dave_gz_model_plugins::UsblTransponder::ISystemPostUpdate)
 
-namespace dave_model_systems
+namespace dave_gz_model_plugins
 {
 
 struct UsblTransponder::PrivateData
@@ -85,7 +85,7 @@ void UsblTransponder::Configure(
   const gz::sim::Entity & _entity, const std::shared_ptr<const sdf::Element> & _sdf,
   gz::sim::EntityComponentManager & _ecm, gz::sim::EventManager & _eventManager)
 {
-  gzdbg << "dave_model_systems::UsblTransponder::Configure on entity: " << _entity << std::endl;
+  gzdbg << "dave_gz_model_plugins::UsblTransponder::Configure on entity: " << _entity << std::endl;
 
   if (!rclcpp::ok())
   {
@@ -336,9 +336,9 @@ void UsblTransponder::PostUpdate(
 {
   if (!_info.paused)
   {
-    // gzdbg << "dave_model_systems::UsblTransponder::PostUpdate" << std::endl;
+    // gzdbg << "dave_gz_model_plugins::UsblTransponder::PostUpdate" << std::endl;
     rclcpp::spin_some(this->ros_node_);
   }
 }
 
-}  // namespace dave_model_systems
+}  // namespace dave_gz_model_plugins
