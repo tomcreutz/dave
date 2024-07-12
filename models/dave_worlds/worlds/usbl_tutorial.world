@@ -37,7 +37,7 @@
 
     <plugin
       filename="UsblTransceiver"
-      name="dave_model_systems::UsblTransceiver">
+      name="dave_gz_model_plugins::UsblTransceiver">
       <namespace>USBL</namespace>
       <transceiver_device>transceiver_manufacturer</transceiver_device>
       <transponder_device>transponder_manufacturer</transponder_device>
@@ -69,7 +69,7 @@
       </link>
     <plugin
     filename="UsblTransponder"
-    name="dave_model_systems::UsblTransponder">
+    name="dave_gz_model_plugins::UsblTransponder">
 	<namespace>USBL</namespace>
 	<transponder_device>transponder_manufacturer</transponder_device>
 	<transponder_ID>1</transponder_ID>
@@ -104,7 +104,7 @@
       </link>
     <plugin
     filename="UsblTransponder"
-    name="dave_model_systems::UsblTransponder">
+    name="dave_gz_model_plugins::UsblTransponder">
 	<namespace>USBL</namespace>
 	<transponder_device>transponder_manufacturer</transponder_device>
 	<transponder_ID>2</transponder_ID>
