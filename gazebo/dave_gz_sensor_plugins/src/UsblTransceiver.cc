@@ -37,18 +37,18 @@
 
 #include <geometry_msgs/msg/vector3.hpp>
 
-#include "dave_gz_model_plugins/UsblTransceiver.hh"
+#include "dave_gz_sensor_plugins/UsblTransceiver.hh"
 
 // available interrogation modes
 std::vector<std::string> im = {"common", "individual"};
 using std::placeholders::_1;
 
 GZ_ADD_PLUGIN(
-  dave_gz_model_plugins::UsblTransceiver, gz::sim::System,
-  dave_gz_model_plugins::UsblTransceiver::ISystemConfigure,
-  dave_gz_model_plugins::UsblTransceiver::ISystemPostUpdate)
+  dave_gz_sensor_plugins::UsblTransceiver, gz::sim::System,
+  dave_gz_sensor_plugins::UsblTransceiver::ISystemConfigure,
+  dave_gz_sensor_plugins::UsblTransceiver::ISystemPostUpdate)
 
-namespace dave_gz_model_plugins
+namespace dave_gz_sensor_plugins
 {
 
 struct UsblTransceiver::PrivateData
@@ -99,7 +99,7 @@ void UsblTransceiver::Configure(
   const gz::sim::Entity & _entity, const std::shared_ptr<const sdf::Element> & _sdf,
   gz::sim::EntityComponentManager & _ecm, gz::sim::EventManager & _eventManager)
 {
-  gzdbg << "dave_gz_model_plugins::UsblTransceiver::Configure on entity: " << _entity << std::endl;
+  gzdbg << "dave_gz_sensor_plugins::UsblTransceiver::Configure on entity: " << _entity << std::endl;
 
   if (!rclcpp::ok())
   {
@@ -502,4 +502,4 @@ void UsblTransceiver::PostUpdate(
   }
 }
 
-}  // namespace dave_gz_model_plugins
+}  // namespace dave_gz_sensor_plugins
