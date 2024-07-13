@@ -83,6 +83,7 @@ struct UsblTransceiver::PrivateData
   std::string m_channel;
   double m_soundSpeed;
   double m_temperature;
+  double m_pingFrequency;
 };
 
 // // Define constants for command IDs
@@ -144,6 +145,18 @@ void UsblTransceiver::Configure(
   }
   this->dataPtr->ns = _sdf->Get<std::string>("namespace");
 
+  // Grab sound speed from SDF
+  if (!_sdf->HasElement("sound_speed"))
+  {
+    this->dataPtr->m_soundSpeed = 1540.0;
+    gzmsg << "Sound speed default to  " << this->dataPtr->m_soundSpeed << std::endl;
+  }
+  else
+  {
+    this->dataPtr->m_soundSpeed = _sdf->Get<double>("sound_speed");
+    gzmsg << "Sound speed: " << this->dataPtr->m_soundSpeed << std::endl;
+  }
+
   // Obtain transceiver device name from SDF
   if (!_sdf->HasElement("transceiver_device"))
   {
@@ -201,7 +214,20 @@ void UsblTransceiver::Configure(
   }
 
   this->dataPtr->m_enablePingerScheduler = _sdf->Get<bool>("enable_ping_scheduler");
-  gzmsg << "pinger enable? " << this->dataPtr->m_enablePingerScheduler << std::endl;
+
+  if (this->dataPtr->m_enablePingerScheduler)
+  {
+    if (!_sdf->HasElement("ping_frequency"))
+    {
+      gzmsg << "Ping frequency not specified, default to 1 Hz" << std::endl;
+      this->dataPtr->m_pingFrequency = 1;
+    }
+    else
+    {
+      this->dataPtr->m_pingFrequency = _sdf->Get<double>("ping_frequency");
+    }
+  }
+  gzmsg << "Pinger enable? " << this->dataPtr->m_enablePingerScheduler << std::endl;
 
   // Get object that transponder attached to
   if (!_sdf->HasElement("transponder_attached_object"))
@@ -218,7 +244,7 @@ void UsblTransceiver::Configure(
   for (auto & object : transpondersObjects)
   {
     this->dataPtr->m_transponderAttachedObjects.push_back(object);
-    gzmsg << "Added " << object << "to list of transponders objects" << std::endl;
+    gzmsg << "Added " << object << " to list of transponders objects" << std::endl;
   }
 
   /*  interrogation mode - 2 options
@@ -375,8 +401,7 @@ void UsblTransceiver::sendPing()
     gzmsg << "Transceiver pose" << pose_transceiver << std::endl;
 
     double dist = (pose_transponder.Pos() - pose_transceiver.Pos()).Length();
-    this->dataPtr->m_soundSpeed =
-      1540.4 + pose_transceiver.Z() / 1000 * 17;  // Defined here because there was no def before
+    this->dataPtr->m_soundSpeed = 1540.4 + pose_transceiver.Z() / 1000 * 17;
 
     sleep(dist / this->dataPtr->m_soundSpeed);
 
@@ -413,6 +438,7 @@ void UsblTransceiver::interrogationModeRosCallback(const std_msgs::msg::String::
   if (std::find(im.begin(), im.end(), mode) != im.end())
   {
     this->dataPtr->m_interrogationMode = mode;
+    gzmsg << "Interrogation mode set to " << mode << std::endl;
   }
   else
   {
@@ -495,9 +521,16 @@ void UsblTransceiver::PostUpdate(
   {
     rclcpp::spin_some(this->ros_node_);
 
-    if (_info.iterations % 1000 == 0)
+    if (this->dataPtr->m_enablePingerScheduler)
     {
-      sendPing();
+      // Calculate the time interval between pings based on frequency
+      double pingInterval = 1.0 / this->dataPtr->m_pingFrequency;
+
+      // Check if it's time to send a ping
+      if (_info.iterations % static_cast<int>(pingInterval * 1000) == 0)
+      {
+        sendPing();
+      }
     }
   }
 }
