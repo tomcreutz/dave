@@ -77,7 +77,7 @@ struct UsblTransponder::PrivateData
 UsblTransponder::UsblTransponder() : dataPtr(std::make_unique<PrivateData>())
 {
   dataPtr->m_temperature = 10.0;  // Default initialization
-  dataPtr->m_noiseSigma = 0.0;    // Default initialization
+  dataPtr->m_noiseSigma = 1.0;    // Default initialization
   dataPtr->m_noiseMu = 0.0;       // Default initialization
 }
 
@@ -128,6 +128,18 @@ void UsblTransponder::Configure(
     return;
   }
   this->dataPtr->ns = _sdf->Get<std::string>("namespace");
+
+  // Grab sound speed from SDF
+  if (!_sdf->HasElement("sound_speed"))
+  {
+    this->dataPtr->m_soundSpeed = 1540.0;
+    gzmsg << "Sound speed default to  " << this->dataPtr->m_soundSpeed << std::endl;
+  }
+  else
+  {
+    this->dataPtr->m_soundSpeed = _sdf->Get<double>("sound_speed");
+    gzmsg << "Sound speed: " << this->dataPtr->m_soundSpeed << std::endl;
+  }
 
   // Obtain transceiver device name from SDF
   if (!_sdf->HasElement("transceiver_device"))
