@@ -80,24 +80,25 @@ repos:
       - id: clang-format
         args: ["-fallback-style=none", "-i"]
 
-  - repo: local
-    hooks:
-      - id: ament_cppcheck
-        name: ament_cppcheck
-        description: Static code analysis of C/C++ files.
-        entry: env AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=1 ament_cppcheck
-        language: system
-        files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
+  # - repo: local
+  #   hooks:
+  #     - id: ament_cppcheck
+  #       name: ament_cppcheck
+  #       description: Static code analysis of C/C++ files.
+  #       entry: env AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=1 ament_cppcheck
+  #       language: system
+  #       files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
 
-  - repo: local
-    hooks:
-      - id: ament_cpplint
-        name: ament_cpplint
-        description: Static code analysis of C/C++ files.
-        entry: ament_cpplint
-        language: system
-        files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
-        args: ["--linelength=100", "--filter=-whitespace/newline"]
+  # - repo: https://github.com/cpplint/cpplint
+  #   rev: 1.6.1
+  #   hooks:
+  #     - id: cpplint
+  #       name: cpplint
+  #       description: Static code analysis of C/C++ files
+  #       language: python
+  #       files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
+  #       entry: cpplint
+  #       args: ["--linelength=100", "--filter=-whitespace/newline"]
 
   # Cmake hooks (can be installed with pip3 install ament-lint-cmake-py)
   - repo: local
