@@ -53,6 +53,7 @@ public:
   void cisRosCallback(const std_msgs::msg::String::SharedPtr msg);
   void commandRosCallback(const dave_interfaces::msg::UsblCommand msg);
   void sendPing();
+  void interrogationModeCallback(const std_msgs::msg::String::SharedPtr msg);
 
 private:
   std::shared_ptr<rclcpp::Node> ros_node_;
