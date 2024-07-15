@@ -16,12 +16,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/UsblResponse.msg"
 )
 
-# Install generated messages
-install(DIRECTORY
-  include/${PROJECT_NAME}/
-  DESTINATION include/${PROJECT_NAME}
-)
-
 # Install message package.xml
 install(FILES
   package.xml
