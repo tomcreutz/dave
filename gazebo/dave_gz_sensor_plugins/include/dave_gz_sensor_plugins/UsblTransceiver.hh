@@ -27,6 +27,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float64.hpp>
 #include <std_msgs/msg/string.hpp>
+#include "dave_interfaces/msg/location.hpp"
 #include "dave_interfaces/msg/usbl_command.hpp"
 #include "dave_interfaces/msg/usbl_response.hpp"
 
@@ -48,7 +49,8 @@ public:
   void PostUpdate(
     const gz::sim::UpdateInfo & info, const gz::sim::EntityComponentManager & ecm) override;
 
-  void receiveGazeboCallback(const gz::msgs::Vector3d & transponder_position);
+  void receiveGazeboCallback(
+    const std::string & transponder, const gz::msgs::Vector3d & transponder_position);
   void temperatureRosCallback(const std_msgs::msg::Float64::SharedPtr msg);
   void interrogationModeRosCallback(const std_msgs::msg::String::SharedPtr msg);
   void commandingResponseCallback(const dave_interfaces::msg::UsblResponse msg);
@@ -56,9 +58,9 @@ public:
   void commandingResponseTestCallback(const std_msgs::msg::String::SharedPtr msg);
   void sendCommand(int command_id, std::string & transponder_id);
   void sendPing();
-  void calcuateRelativePose(
+  void calculateRelativePose(
     gz::math::Vector3<double> position, double & bearing, double & range, double & elevation);
-  void publishPosition(double & bearing, double & range, double & elevation);
+  void publishPosition(int & transponder_id, double & bearing, double & range, double & elevation);
 
 private:
   std::shared_ptr<rclcpp::Node> ros_node_;

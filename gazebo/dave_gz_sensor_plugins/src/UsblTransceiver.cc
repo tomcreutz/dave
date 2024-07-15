@@ -69,21 +69,25 @@ struct UsblTransceiver::PrivateData
   std::string m_interrogationMode;
   gz::sim::Entity linkEntity;
   gz::transport::Node m_gzNode;
-  rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr m_publishTransponderRelPos;
+  rclcpp::Publisher<dave_interfaces::msg::Location>::SharedPtr m_publishTransponderRelPos;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_cisPinger;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_interrogationModePub;
   std::unordered_map<std::string, rclcpp::Publisher<std_msgs::msg::String>::SharedPtr> m_iisPinger;
   std::unordered_map<std::string, rclcpp::Publisher<dave_interfaces::msg::UsblCommand>::SharedPtr>
     m_commandPubs;
-  rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr m_publishTransponderRelPosCartesian;
+  rclcpp::Publisher<dave_interfaces::msg::Location>::SharedPtr m_publishTransponderRelPosCartesian;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr m_temperatureSub;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_interrogationModeSub;
   rclcpp::Subscription<dave_interfaces::msg::UsblResponse>::SharedPtr m_commandResponseSub;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_channelSwitchSub;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_commandResponseTestSub;
+  std::unordered_map<std::string, std::function<void(const gz::msgs::Vector3d &)>>
+    transponderCallbacks;
   std::string m_channel;
   double m_soundSpeed;
   double m_temperature;
   double m_pingFrequency;
+  bool setGlobalMode;
 };
 
 // // Define constants for command IDs
@@ -94,6 +98,7 @@ UsblTransceiver::UsblTransceiver() : dataPtr(std::make_unique<PrivateData>())
 {
   dataPtr->m_channel = "1";
   dataPtr->m_temperature = 10.0;
+  dataPtr->setGlobalMode = false;
 }
 
 void UsblTransceiver::Configure(
@@ -259,6 +264,7 @@ void UsblTransceiver::Configure(
   if (_sdf->HasElement("interrogation_mode"))
   {
     std::string interrogation_mode = _sdf->Get<std::string>("interrogation_mode");
+    gzmsg << interrogation_mode << " interrogation mode is requested" << std::endl;
     if (std::find(im.begin(), im.end(), interrogation_mode) != im.end())
     {
       gzmsg << interrogation_mode << " interrogation mode is used" << std::endl;
@@ -287,8 +293,14 @@ void UsblTransceiver::Configure(
 
     gzmsg << "Transponder topic" << transponder_position << std::endl;
 
-    this->dataPtr->m_gzNode.Subscribe(
-      transponder_position, &UsblTransceiver::receiveGazeboCallback, this);
+    // Created lambda function to get the transponder ID in the created callback
+
+    std::function<void(const gz::msgs::Vector3d &)> callback =
+      [this, transponder](const gz::msgs::Vector3d & msg)
+    { this->receiveGazeboCallback(transponder, msg); };
+
+    this->dataPtr->transponderCallbacks[transponder] = callback;
+    this->dataPtr->m_gzNode.Subscribe(transponder_position, callback);
   }
 
   // ROS2 Publishers
@@ -297,12 +309,21 @@ void UsblTransceiver::Configure(
                                            this->dataPtr->m_transceiverDevice + "_" +
                                            this->dataPtr->m_transceiverID + "/transponder_location";
 
-  this->dataPtr->m_publishTransponderRelPos =
-    this->ros_node_->create_publisher<geometry_msgs::msg::Vector3>(transponder_location_topic, 1);
+  std::string interrogation_mode_topic = "/" + this->dataPtr->ns + "/" +
+                                         this->dataPtr->m_transceiverDevice + "_" +
+                                         this->dataPtr->m_transceiverID + "/interrogation_mode";
 
   std::string cis_pinger_topic = "/" + this->dataPtr->ns + "/common_interrogation_ping";
+
+  this->dataPtr->m_publishTransponderRelPos =
+    this->ros_node_->create_publisher<dave_interfaces::msg::Location>(
+      transponder_location_topic, 1);
+
   this->dataPtr->m_cisPinger =
     this->ros_node_->create_publisher<std_msgs::msg::String>(cis_pinger_topic, 1);
+
+  this->dataPtr->m_interrogationModePub =
+    this->ros_node_->create_publisher<std_msgs::msg::String>(interrogation_mode_topic, 1);
 
   for (auto & transponder : this->dataPtr->m_deployedTransponders)
   {
@@ -322,7 +343,7 @@ void UsblTransceiver::Configure(
     this->dataPtr->m_transceiverID + "/transponder_location_cartesian";
 
   this->dataPtr->m_publishTransponderRelPosCartesian =
-    this->ros_node_->create_publisher<geometry_msgs::msg::Vector3>(
+    this->ros_node_->create_publisher<dave_interfaces::msg::Location>(
       transponder_location_cartesian_topic, 1);
 
   // ROS2 Subscribers
@@ -334,9 +355,8 @@ void UsblTransceiver::Configure(
 
   this->dataPtr->m_interrogationModeSub =
     this->ros_node_->create_subscription<std_msgs::msg::String>(
-      "/" + this->dataPtr->ns + "/" + this->dataPtr->m_transceiverDevice + "_" +
-        this->dataPtr->m_transceiverID + "/interrogation_mode",
-      1, std::bind(&UsblTransceiver::interrogationModeRosCallback, this, _1));
+      interrogation_mode_topic, 1,
+      std::bind(&UsblTransceiver::interrogationModeRosCallback, this, _1));
 
   this->dataPtr->m_commandResponseSub =
     this->ros_node_->create_subscription<dave_interfaces::msg::UsblResponse>(
@@ -424,6 +444,16 @@ void UsblTransceiver::channelSwitchCallback(const std_msgs::msg::String::SharedP
 {
   gzmsg << "Switching to transponder_" << msg->data << " channel\n";
   this->dataPtr->m_channel = msg->data;
+
+  this->dataPtr->m_interrogationMode = "individual";
+
+  std_msgs::msg::String mode;
+  mode.data = this->dataPtr->m_interrogationMode;
+
+  this->dataPtr->m_interrogationModePub->publish(mode);
+
+  gzmsg << "Interrogation mode set to individual, because channel switch was requested"
+        << std::endl;
 }
 
 void UsblTransceiver::commandingResponseCallback(const dave_interfaces::msg::UsblResponse msg)
@@ -460,31 +490,84 @@ void UsblTransceiver::temperatureRosCallback(const std_msgs::msg::Float64::Share
         << this->dataPtr->m_soundSpeed << " m/s\n";
 }
 
-void UsblTransceiver::receiveGazeboCallback(const gz::msgs::Vector3d & transponder_position)
+void UsblTransceiver::receiveGazeboCallback(
+  const std::string & transponder, const gz::msgs::Vector3d & transponder_position)
 {
-  // gzmsg << "Transceiver acquires transponders position: " << transponder_position.x() << " "
-  //       << transponder_position.y() << " " << transponder_position.z() << std::endl;
+  bool publish;
 
-  gz::math::Vector3<double> transponder_position_ign = gz::math::Vector3<double>(
-    transponder_position.x(), transponder_position.y(), transponder_position.z());
+  if (this->dataPtr->m_interrogationMode.compare("common") == 0)
+  {
+    gzmsg << "In common mode, publishing position..." << std::endl;
 
-  double bearing = 0, range = 0, elevation = 0;
-  calcuateRelativePose(transponder_position_ign, bearing, range, elevation);
+    publish = true;
+  }
+  else if (
+    this->dataPtr->m_interrogationMode.compare("individual") == 0 &&
+    transponder.compare(this->dataPtr->m_channel) == 0)
+  {
+    publish = true;
 
-  publishPosition(bearing, range, elevation);
+    gzmsg << "In individual mode, publishing position for transponder_" << transponder << std::endl;
+  }
+  else
+  {
+    publish = false;
+
+    gzmsg << "Interrogation mode is not set to common and wrong channel is being pinged"
+          << std::endl;
+  }
+
+  if (publish)
+  {
+    gzmsg << "Transceiver acquires transponder_" << transponder
+          << " position: " << transponder_position.x() << " " << transponder_position.y() << " "
+          << transponder_position.z() << std::endl;
+
+    int transponder_id;
+
+    try
+    {
+      transponder_id = std::stoi(transponder);
+    }
+    catch (const std::invalid_argument & e)
+    {
+      gzmsg << "Invalid transponder ID: " << transponder_id << std::endl;
+
+      return;
+    }
+    catch (const std::out_of_range & e)
+    {
+      gzmsg << "Transponder ID out of range: " << transponder_id << std::endl;
+
+      return;
+    }
+
+    gz::math::Vector3<double> transponder_position_ign = gz::math::Vector3<double>(
+      transponder_position.x(), transponder_position.y(), transponder_position.z());
+
+    double bearing = 0, range = 0, elevation = 0;
+    calculateRelativePose(transponder_position_ign, bearing, range, elevation);
+
+    publishPosition(transponder_id, bearing, range, elevation);
+  }
 }
 
-void UsblTransceiver::publishPosition(double & bearing, double & range, double & elevation)
+void UsblTransceiver::publishPosition(
+  int & transponder_id, double & bearing, double & range, double & elevation)
 {
-  geometry_msgs::msg::Vector3 location;
+  dave_interfaces::msg::Location location;
+
   location.x = bearing;
   location.y = range;
   location.z = elevation;
 
-  geometry_msgs::msg::Vector3 location_cartesian;
+  dave_interfaces::msg::Location location_cartesian;
   location_cartesian.x = range * cos(elevation * M_PI / 180) * cos(bearing * M_PI / 180);
   location_cartesian.y = range * cos(elevation * M_PI / 180) * sin(bearing * M_PI / 180);
   location_cartesian.z = range * sin(elevation * M_PI / 180);
+
+  location_cartesian.transponder_id = transponder_id;
+  location.transponder_id = transponder_id;
 
   // gzmsg << "Spherical Coordinate: \n\tBearing: " << location.x
   //       << " degree(s)\n\tRange: " << location.y << " m\n\tElevation: " << location.z
@@ -497,7 +580,7 @@ void UsblTransceiver::publishPosition(double & bearing, double & range, double &
   this->dataPtr->m_publishTransponderRelPosCartesian->publish(location_cartesian);
 }
 
-void UsblTransceiver::calcuateRelativePose(
+void UsblTransceiver::calculateRelativePose(
   gz::math::Vector3<double> position, double & bearing, double & range, double & elevation)
 {
   gz::math::Pose3d pose = worldPose(this->dataPtr->linkEntity, *this->dataPtr->ecm);
@@ -520,6 +603,16 @@ void UsblTransceiver::PostUpdate(
   if (!_info.paused)
   {
     rclcpp::spin_some(this->ros_node_);
+
+    if (!this->dataPtr->setGlobalMode)
+    {
+      std_msgs::msg::String mode;
+      mode.data = this->dataPtr->m_interrogationMode;
+
+      this->dataPtr->m_interrogationModePub->publish(mode);
+      gzmsg << "Published mode" << std::endl;
+      this->dataPtr->setGlobalMode = true;
+    }
 
     if (this->dataPtr->m_enablePingerScheduler)
     {
