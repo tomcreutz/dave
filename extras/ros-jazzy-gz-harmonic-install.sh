@@ -34,6 +34,7 @@ sudo apt install -y \
     ruby \
     software-properties-common \
     sudo \
+    cppzmq-dev \
     wget
 
 echo
