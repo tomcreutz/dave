@@ -120,7 +120,7 @@ bool SphericalCoords::TransformFromSphericalCoord(
   gzmsg << "Called FROM and latitude: " << scVec.X() << std::endl;
 
   auto coords = this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm);
-  gz::math::Vector3d cartVec = coords->SphericalFromLocalPosition(scVec);
+  gz::math::Vector3d cartVec = coords->LocalFromSphericalPosition(scVec);
 
   response->output.x = cartVec.X();
   response->output.y = cartVec.Y();
