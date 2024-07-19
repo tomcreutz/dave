@@ -72,19 +72,17 @@ sudo apt update && apt install -y \
     python3-rosinstall-generator \
     python3-vcstool \
     $GAZEBO \
-    ros-$DIST-desktop \
+    ros-$DIST-desktop-full \
     ros-$DIST-ros-gz \
     ros-$DIST-gz-ros2-control \
     ros-$DIST-effort-controllers \
     ros-$DIST-geographic-info \
-    ros-$DIST-image-view \
     ros-$DIST-joint-state-publisher \
     ros-$DIST-joy-teleop \
     ros-$DIST-key-teleop \
     ros-$DIST-moveit-planners \
     ros-$DIST-moveit-simple-controller-manager \
     ros-$DIST-moveit-ros-visualization \
-    ros-$DIST-pcl-ros \
     ros-$DIST-robot-localization \
     ros-$DIST-ros2-controllers \
     ros-$DIST-teleop-tools \
