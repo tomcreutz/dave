@@ -167,34 +167,50 @@ bool SphericalCoords::SetOriginSphericalCoord(
   const std::shared_ptr<dave_interfaces::srv::SetOriginSphericalCoord::Request> request,
   std::shared_ptr<dave_interfaces::srv::SetOriginSphericalCoord::Response> response)
 {
+  auto optionalSphericalCoords = this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm);
+
+  if (!optionalSphericalCoords.has_value())
+  {
+    gzmsg << "Failed to get spherical coordinates" << std::endl;
+    response->success = false;
+    return false;
+  }
+
+  auto sphericalCoords = optionalSphericalCoords.value();
+
+  // gzmsg << "Current Spherical Coordinates Before Setting: "
+  //       << "Latitude: " << sphericalCoords.LatitudeReference().Degree()
+  //       << ", Longitude: " << sphericalCoords.LongitudeReference().Degree()
+  //       << ", Altitude: " << sphericalCoords.ElevationReference() << std::endl;
+
   gz::math::Angle angle;
 
   angle.SetDegree(request->latitude_deg);
-
-  this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->SetLatitudeReference(angle);
+  sphericalCoords.SetLatitudeReference(angle);
 
   angle.SetDegree(request->longitude_deg);
+  sphericalCoords.SetLongitudeReference(angle);
 
-  this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->SetLongitudeReference(angle);
-  this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)
-    ->SetElevationReference(request->altitude);
+  sphericalCoords.SetElevationReference(request->altitude);
+
+  // Apply the modified spherical coordinates back to the world
+  this->dataPtr->world.SetSphericalCoordinates(*this->dataPtr->ecm, sphericalCoords);
 
   response->success = true;
 
-  // Debugging information
-  gzmsg << "SetOriginSphericalCoord called with: "
-        << "Latitude: " << request->latitude_deg << ", Longitude: " << request->longitude_deg
-        << ", Altitude: " << request->altitude << std::endl;
+  auto newSphericalCoords = this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm);
 
-  gzmsg
-    << "New Spherical Coordinates: "
-    << "Latitude: "
-    << this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->LatitudeReference().Degree()
-    << ", Longitude: "
-    << this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->LongitudeReference().Degree()
-    << ", Altitude: "
-    << this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->ElevationReference()
-    << std::endl;
+  if (newSphericalCoords.has_value())
+  {
+    gzmsg << "Current Spherical Coordinates after Setting: "
+          << "Latitude: " << newSphericalCoords->LatitudeReference().Degree()
+          << ", Longitude: " << newSphericalCoords->LongitudeReference().Degree()
+          << ", Altitude: " << newSphericalCoords->ElevationReference() << std::endl;
+  }
+  else
+  {
+    gzmsg << "Failed to get new spherical coordinates" << std::endl;
+  }
 
   return true;
 }
