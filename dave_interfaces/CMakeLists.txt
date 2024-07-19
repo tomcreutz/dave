@@ -9,12 +9,19 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/UsblCommand.msg"
   "msg/UsblResponse.msg"
   "msg/Location.msg"
+  "srv/SetOriginSphericalCoord.srv"
+  "srv/GetOriginSphericalCoord.srv"
+  "srv/TransformToSphericalCoord.srv"
+  "srv/TransformFromSphericalCoord.srv"
+  DEPENDENCIES geometry_msgs
 )
 
 # Install message package.xml

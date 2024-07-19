@@ -44,6 +44,8 @@
 			<longitude_deg>3.515625</longitude_deg>
 		</spherical_coordinates>
 
+		<plugin filename="SphericalCoords" name="dave_ros_gz_plugins::SphericalCoords"> </plugin>
+
 		<!-- Global Light Source -->
 		<light type="directional" name="sun1">
 			<pose>50 0 150 0 0 0</pose>

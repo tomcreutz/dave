@@ -21,7 +21,13 @@
 #include <memory>
 
 #include <gz/sim/System.hh>
+
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/service.hpp>
+#include "dave_interfaces/srv/get_origin_spherical_coord.hpp"
+#include "dave_interfaces/srv/set_origin_spherical_coord.hpp"
+#include "dave_interfaces/srv/transform_from_spherical_coord.hpp"
+#include "dave_interfaces/srv/transform_to_spherical_coord.hpp"
 
 namespace dave_ros_gz_plugins
 
@@ -40,6 +46,22 @@ public:
 
   void PostUpdate(
     const gz::sim::UpdateInfo & info, const gz::sim::EntityComponentManager & ecm) override;
+
+  bool GetOriginSphericalCoord(
+    const std::shared_ptr<dave_interfaces::srv::GetOriginSphericalCoord::Request> request,
+    std::shared_ptr<dave_interfaces::srv::GetOriginSphericalCoord::Response> response);
+
+  bool SetOriginSphericalCoord(
+    const std::shared_ptr<dave_interfaces::srv::SetOriginSphericalCoord::Request> request,
+    std::shared_ptr<dave_interfaces::srv::SetOriginSphericalCoord::Response> response);
+
+  bool TransformToSphericalCoord(
+    const std::shared_ptr<dave_interfaces::srv::TransformToSphericalCoord::Request> request,
+    std::shared_ptr<dave_interfaces::srv::TransformToSphericalCoord::Response> response);
+
+  bool TransformFromSphericalCoord(
+    const std::shared_ptr<dave_interfaces::srv::TransformFromSphericalCoord::Request> request,
+    std::shared_ptr<dave_interfaces::srv::TransformFromSphericalCoord::Response> response);
 
 private:
   std::shared_ptr<rclcpp::Node> ros_node_;

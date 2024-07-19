@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-#include <gz/msgs/vector3d.pb.h>
-#include <algorithm>
 #include <iostream>
 
 #include <gz/common/Console.hh>
-#include <gz/sim/Model.hh>
-#include <gz/sim/Util.hh>
+#include <gz/math/SphericalCoordinates.hh>
 #include <gz/sim/World.hh>
-#include <gz/sim/components/Link.hh>
-#include <gz/sim/components/Name.hh>
-#include <gz/sim/components/ParentEntity.hh>
-#include <gz/transport/Node.hh>
 #include <rclcpp/rclcpp.hpp>
-#include "gz/common/StringUtils.hh"
 #include "gz/plugin/Register.hh"
-#include "gz/sim/components/Model.hh"
 #include "gz/sim/components/World.hh"
 
 #include "dave_ros_gz_plugins/SphericalCoords.hh"
@@ -45,10 +36,13 @@ namespace dave_ros_gz_plugins
 struct SphericalCoords::PrivateData
 {
   // Add any private data members here.
-  gz::sim::Model model;
-  std::string modelName;
   std::string ns;
   gz::sim::EntityComponentManager * ecm;
+  gz::sim::World world;
+  rclcpp::Service<dave_interfaces::srv::GetOriginSphericalCoord>::SharedPtr getOriginSrv;
+  rclcpp::Service<dave_interfaces::srv::SetOriginSphericalCoord>::SharedPtr setOriginSrv;
+  rclcpp::Service<dave_interfaces::srv::TransformToSphericalCoord>::SharedPtr transformToSrv;
+  rclcpp::Service<dave_interfaces::srv::TransformFromSphericalCoord>::SharedPtr transformFromSrv;
 };
 
 SphericalCoords::SphericalCoords() : dataPtr(std::make_unique<PrivateData>()) {}
@@ -57,24 +51,166 @@ void SphericalCoords::Configure(
   const gz::sim::Entity & _entity, const std::shared_ptr<const sdf::Element> & _sdf,
   gz::sim::EntityComponentManager & _ecm, gz::sim::EventManager & _eventManager)
 {
-  gzdbg << "dave_ros_gz_plugins::UsblTransceiver::Configure on entity: " << _entity << std::endl;
+  gzdbg << "dave_ros_gz_plugins::SphericalCoords::Configure on entity: " << _entity << std::endl;
 
   if (!rclcpp::ok())
   {
     rclcpp::init(0, nullptr);
   }
 
-  this->ros_node_ = std::make_shared<rclcpp::Node>("usbl_transceiver_node");
+  this->ros_node_ = std::make_shared<rclcpp::Node>("sc_node");
 
-  auto model = gz::sim::Model(_entity);
-  this->dataPtr->model = model;
-  this->dataPtr->modelName = model.Name(_ecm);
+  // auto model = gz::sim::Model(_entity);
+  // this->dataPtr->model = model;
+  // this->dataPtr->modelName = model.Name(_ecm);
   this->dataPtr->ecm = &_ecm;
+
+  auto worldEntity = _ecm.EntityByComponents(gz::sim::components::World());
+  this->dataPtr->world = gz::sim::World(worldEntity);
+
+  auto coordsOpt = this->dataPtr->world.SphericalCoordinates(_ecm);
+
+  if (coordsOpt.has_value())
+  {
+    auto coords = coordsOpt.value();
+    gzmsg << "Spherical coordinates reference=" << std::endl
+          << "\t- Latitude [degrees]=" << coords.LatitudeReference().Degree() << std::endl
+          << "\t- Longitude [degrees]=" << coords.LongitudeReference().Degree() << std::endl
+          << "\t- Altitude [m]=" << coords.ElevationReference() << std::endl
+          << "\t- Heading [degrees] =" << coords.HeadingOffset().Degree() << std::endl;
+  }
+  else
+  {
+    gzmsg << "Spherical coordinates not available." << std::endl;
+  }
+
+  this->dataPtr->getOriginSrv =
+    this->ros_node_->create_service<dave_interfaces::srv::GetOriginSphericalCoord>(
+      "/gz/get_origin_spherical_coordinates", std::bind(
+                                                &SphericalCoords::GetOriginSphericalCoord, this,
+                                                std::placeholders::_1, std::placeholders::_2));
+
+  this->dataPtr->setOriginSrv =
+    this->ros_node_->create_service<dave_interfaces::srv::SetOriginSphericalCoord>(
+      "/gz/set_origin_spherical_coordinates", std::bind(
+                                                &SphericalCoords::SetOriginSphericalCoord, this,
+                                                std::placeholders::_1, std::placeholders::_2));
+
+  this->dataPtr->transformToSrv =
+    this->ros_node_->create_service<dave_interfaces::srv::TransformToSphericalCoord>(
+      "/gz/transform_to_spherical_coordinates", std::bind(
+                                                  &SphericalCoords::TransformToSphericalCoord, this,
+                                                  std::placeholders::_1, std::placeholders::_2));
+
+  this->dataPtr->transformFromSrv =
+    this->ros_node_->create_service<dave_interfaces::srv::TransformFromSphericalCoord>(
+      "/gz/transform_from_spherical_coordinates",
+      std::bind(
+        &SphericalCoords::TransformFromSphericalCoord, this, std::placeholders::_1,
+        std::placeholders::_2));
+}
+
+bool SphericalCoords::TransformFromSphericalCoord(
+  const std::shared_ptr<dave_interfaces::srv::TransformFromSphericalCoord::Request> request,
+  std::shared_ptr<dave_interfaces::srv::TransformFromSphericalCoord::Response> response)
+{
+  gz::math::Vector3d scVec =
+    gz::math::Vector3d(request->latitude_deg, request->longitude_deg, request->altitude);
+
+  gzmsg << "Called FROM and latitude: " << scVec.X() << std::endl;
+
+  auto coords = this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm);
+  gz::math::Vector3d cartVec = coords->SphericalFromLocalPosition(scVec);
+
+  response->output.x = cartVec.X();
+  response->output.y = cartVec.Y();
+  response->output.z = cartVec.Z();
+
+  return true;
+}
+
+bool SphericalCoords::TransformToSphericalCoord(
+  const std::shared_ptr<dave_interfaces::srv::TransformToSphericalCoord::Request> request,
+  std::shared_ptr<dave_interfaces::srv::TransformToSphericalCoord::Response> response)
+{
+  gz::math::Vector3d cartVec =
+    gz::math::Vector3d(request->input.x, request->input.y, request->input.z);
+
+  gzmsg << "Called TO and X: " << cartVec.X() << std::endl;
+
+  auto coords = this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm);
+  gz::math::Vector3d scVec = coords->SphericalFromLocalPosition(cartVec);
+
+  response->latitude_deg = scVec.X();
+  response->longitude_deg = scVec.Y();
+  response->altitude = scVec.Z();
+
+  return true;
+}
+
+bool SphericalCoords::GetOriginSphericalCoord(
+  const std::shared_ptr<dave_interfaces::srv::GetOriginSphericalCoord::Request> request,
+  std::shared_ptr<dave_interfaces::srv::GetOriginSphericalCoord::Response> response)
+{
+  response->latitude_deg =
+    this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->LatitudeReference().Degree();
+  response->longitude_deg =
+    this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->LongitudeReference().Degree();
+  response->altitude =
+    this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->ElevationReference();
+
+  gzmsg << "Called Get" << std::endl;
+  return true;
+}
+
+bool SphericalCoords::SetOriginSphericalCoord(
+  const std::shared_ptr<dave_interfaces::srv::SetOriginSphericalCoord::Request> request,
+  std::shared_ptr<dave_interfaces::srv::SetOriginSphericalCoord::Response> response)
+{
+  gz::math::Angle angle;
+
+  angle.SetDegree(request->latitude_deg);
+
+  this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->SetLatitudeReference(angle);
+
+  angle.SetDegree(request->longitude_deg);
+
+  this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->SetLongitudeReference(angle);
+  this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)
+    ->SetElevationReference(request->altitude);
+
+  response->success = true;
+
+  // Debugging information
+  gzmsg << "SetOriginSphericalCoord called with: "
+        << "Latitude: " << request->latitude_deg << ", Longitude: " << request->longitude_deg
+        << ", Altitude: " << request->altitude << std::endl;
+
+  gzmsg
+    << "New Spherical Coordinates: "
+    << "Latitude: "
+    << this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->LatitudeReference().Degree()
+    << ", Longitude: "
+    << this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->LongitudeReference().Degree()
+    << ", Altitude: "
+    << this->dataPtr->world.SphericalCoordinates(*this->dataPtr->ecm)->ElevationReference()
+    << std::endl;
+
+  return true;
 }
 
 void SphericalCoords::PostUpdate(
   const gz::sim::UpdateInfo & _info, const gz::sim::EntityComponentManager & _ecm)
 {
+  if (!_info.paused)
+  {
+    rclcpp::spin_some(this->ros_node_);
+
+    if (_info.iterations % 1000 == 0)
+    {
+      gzmsg << "dave_ros_gz_plugins::SphericalCoords::PostUpdate" << std::endl;
+    }
+  }
 }
 
 }  // namespace dave_ros_gz_plugins
