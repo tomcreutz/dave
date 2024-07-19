@@ -72,7 +72,7 @@ sudo apt update && apt install -y \
     python3-vcstool \
     $GAZEBO \
     ros-$DIST-desktop-full \
-    ros-$DIST-gz-plugin-vendor \
+    ros-$DIST-ros-gz \
     ros-$DIST-gz-ros2-control \
     ros-$DIST-effort-controllers \
     ros-$DIST-geographic-info \
@@ -87,7 +87,6 @@ sudo apt update && apt install -y \
     ros-$DIST-pcl-ros \
     ros-$DIST-robot-localization \
     ros-$DIST-robot-state-publisher \
-    ros-$DIST-ros-base \
     ros-$DIST-ros2-controllers \
     ros-$DIST-rqt \
     ros-$DIST-rqt-common-plugins \
@@ -99,8 +98,7 @@ sudo apt update && apt install -y \
     ros-$DIST-tf2-tools \
     ros-$DIST-urdfdom-py \
     ros-$DIST-xacro \
-    ros-dev-tools \
-    ros-$DIST-ros-gz
+    ros-dev-tools
 
 echo
 echo -e "\033[32m============================================================\033[0m"
