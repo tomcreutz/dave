@@ -110,5 +110,6 @@ echo -e "\033[32mROS-Gazebo Framework Installation completed. Awesome! 🤘🚀 
 echo -e "Following command will set-up ROS-Gazebo environment variables to run it"
 echo -e "\033[95msource /opt/ros/jazzy/setup.bash\033[0m"
 echo -e "\033[95msource /opt/gazebo/install/setup.bash\033[0m"
+echo -e "\033[95mexport PYTHONPATH=\$PYTHONPATH:/opt/gazebo/install/lib/python\033[0m"
 echo -e "You may check ROS, and Gazebo version installed with \033[33mprintenv ROS_DISTRO\033[0m and \033[33mecho \$GZ_VERSION\033[0m"
 echo
