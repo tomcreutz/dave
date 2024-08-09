@@ -39,11 +39,11 @@ RUN adduser --shell /bin/bash --disabled-password --gecos '' $USER \
 
 # Install ROS-Gazebo framework
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-extras/ros-jazzy-gz-harmonic-install.sh install.sh
+extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
 # Set up Dave workspace
-ENV DAVE_WS /root/ws_dave
+ENV DAVE_WS=/opt/ws_dave
 WORKDIR $DAVE_WS/src
 
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
@@ -62,8 +62,17 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
 
 # source entrypoint setup
 RUN touch /ros_entrypoint.sh && sed --in-place --expression \
-    '$i source "$DAVE_WS/install/setup.bash"' /ros_entrypoint.sh
+    '$i source "/opt/ws_dave/install/setup.bash"' /ros_entrypoint.sh
+
+# Source ROS and Gazebo
+RUN sed --in-place --expression \
+'$i source "/opt/ros/jazzy/setup.bash"' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i source "/opt/gazebo/install/setup.bash"' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i export PYTHONPATH=$PYTHONPATH:/opt/gazebo/install/lib/python' /ros_entrypoint.sh
 
 # Set User as user
 USER $USER
-RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc  && \
+    echo "source /opt/gazebo/install/setup.bash" >> ~/.bashrc
