@@ -3,11 +3,15 @@
   <name>dave_gz_sensor_plugins</name>
   <version>0.0.0</version>
   <description>DAVE sensor plugins</description>
+  <maintainer email="gaurav.og.9920@gmail.com">Gaurav kumar</maintainer>
   <maintainer email="helenamoyen@gmail.com">Helena Moyen</maintainer>
   <license>Apache 2.0</license>
+  <depend>geometry_msgs</depend>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <test_depend>ament_lint_auto</test_depend>
   <build_depend>dave_interfaces</build_depend>
+  <build_depend>protobuf</build_depend>
+  <exec_depend>protobuf</exec_depend>
   <exec_depend>dave_interfaces</exec_depend>
   <export>
     <build_type>ament_cmake</build_type>
