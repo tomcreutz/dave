@@ -1,10 +1,9 @@
 
 <?xml version="1.0"?>
-<sdf version="1.4">
+<sdf version="1.6">
   <model name="underwater_camera">
     <pose>0 0 0 0 0 0</pose>
     <link name="link">
-      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <mass>0.1</mass>
         <inertia>
@@ -27,25 +26,37 @@
           </box>
         </geometry>
       </visual>
-      <sensor name="underwater_camera" type="depth_camera">
+      <sensor name="underwater_camera" type="rgbd_camera">
         <update_rate>10</update_rate>
-        <!-- <camera_topic>camera</camera_topic>
-        <depth_topic>depth_camera</depth_topic> -->
-        <topic>depth_camera</topic>
+        <visualize>true</visualize>
+        <always_on>1</always_on>
+        <topic>rgbd_camera</topic>
         <camera>
           <horizontal_fov>1.05</horizontal_fov>
           <image>
-            <width>256</width>
-            <height>256</height>
-            <format>R_FLOAT32</format>
+            <width>320</width>
+            <height>240</height>
           </image>
           <clip>
             <near>0.1</near>
             <far>10.0</far>
           </clip>
         </camera>
-        </sensor>
+      </sensor>
     </link>
     <static>true</static>
+
+    <plugin
+      filename="UnderwaterCamera"
+      name="dave_gz_sensor_plugins::UnderwaterCamera">
+      <topic>rgbd_camera</topic>
+      <attenuationR>0.01</attenuationR>
+      <attenuationG>0.01</attenuationG>
+      <attenuationB>0.003</attenuationB>
+      <backgroundR>0</backgroundR>
+      <backgroundG>0</backgroundG>
+      <backgroundB>0</backgroundB>
+    </plugin>
+
   </model>
 </sdf>

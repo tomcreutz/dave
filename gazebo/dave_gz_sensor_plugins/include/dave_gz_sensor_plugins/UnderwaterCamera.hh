@@ -48,9 +48,13 @@ public:
 
   void CameraCallback(const gz::msgs::Image & image);
 
+  void CameraInfoCallback(const gz::msgs::CameraInfo & cameraInfo);
+
   void DepthImageCallback(const gz::msgs::Image & image);
 
-  void SimulateUnderwater(
+  cv::Mat ConvertGazeboToOpenCV(const gz::msgs::Image &gz_image);
+
+  cv::Mat SimulateUnderwater(
     const cv::Mat& _inputImage, const cv::Mat& _inputDepth,
     cv::Mat& _outputImage);
 

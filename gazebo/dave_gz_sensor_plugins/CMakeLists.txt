@@ -50,6 +50,7 @@ target_link_libraries(sea_pressure_sensor
 
 target_link_libraries(UnderwaterCamera
   gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER}
+  ${OpenCV_LIBS}
 )
 
 # Specify dependencies for FullSystem using ament_target_dependencies
