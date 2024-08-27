@@ -126,7 +126,18 @@ def generate_launch_description():
         parameters=[{"use_sim_time_time": use_sim_time}],
     )
 
-    nodes = [tf2_spawner, gz_spawner]
+    # Bridge
+    bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            "/imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
+            "/magnetometer@sensor_msgs/msg/MagneticField@gz.msgs.Magnetometer"
+        ],
+        output="screen",
+    )
+
+    nodes = [tf2_spawner, gz_spawner, bridge]
 
     event_handlers = [
         RegisterEventHandler(
