@@ -113,11 +113,23 @@
     </include>
 
     <include>
-      <pose>10 0 -95 0 0 0</pose>
-      <uri>
-      https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Barrel
-      </uri>
-      <static>1</static>
+      <name>sunken_vase</name>
+      <pose>7.5 0 -95 0 0 0</pose>
+      <uri>https://fuel.ignitionrobotics.org/1.0/Cole/models/Sunken Vase</uri>
+    </include>
+
+    <include>
+      <name>sunken_vase_distorted</name>
+      <pose>7.5 1 -95 0 0 0</pose>
+      <uri>https://fuel.gazebosim.org/1.0/hmoyen/models/Sunken Vase Distorted</uri>
+      <static>true</static>
+    </include>
+
+    <include>
+      <name>Coral1</name>
+      <pose>7 -1 -95 0 0 0</pose>
+      <uri>https://fuel.ignitionrobotics.org/1.0/Cole/models/Coral01</uri>
+      <static>true</static>
     </include>
 
     <plugin
