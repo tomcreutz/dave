@@ -16,14 +16,8 @@ def generate_launch_description():
     ]
 
     rexrov_arguments = (
-        [
-            f"{joint}/cmd_thrust@std_msgs/msg/Float64@gz.msgs.Double"
-            for joint in thruster_joints
-        ]
-        + [
-            f"{joint}/ang_vel@std_msgs/msg/Float64@gz.msgs.Double"
-            for joint in thruster_joints
-        ]
+        [f"{joint}/cmd_thrust@std_msgs/msg/Float64@gz.msgs.Double" for joint in thruster_joints]
+        + [f"{joint}/ang_vel@std_msgs/msg/Float64@gz.msgs.Double" for joint in thruster_joints]
         + [
             f"{joint}/enable_deadband@std_msgs/msg/Bool@gz.msgs.Boolean"
             for joint in thruster_joints
