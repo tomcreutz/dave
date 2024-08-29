@@ -1,10 +1,20 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler, LogInfo
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.actions import (
+    DeclareLaunchArgument,
+    RegisterEventHandler,
+    LogInfo,
+    IncludeLaunchDescription,
+)
+from launch.substitutions import (
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    EqualsSubstitution,
+)
 from launch.conditions import IfCondition
 from launch_ros.substitutions import FindPackageShare
 from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
@@ -126,18 +136,33 @@ def generate_launch_description():
         parameters=[{"use_sim_time_time": use_sim_time}],
     )
 
-    # Bridge
-    bridge = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        arguments=[
-            "/imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
-            "/magnetometer@sensor_msgs/msg/MagneticField@gz.msgs.Magnetometer"
-        ],
-        output="screen",
+    nodes = [tf2_spawner, gz_spawner]
+
+    # Include the Rexrov launch file if the namespace is "rexrov"
+    rexrov_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [FindPackageShare("dave_robot_models"), "launch", "rexrov.launch.py"]
+            )
+        ),
+        condition=IfCondition(EqualsSubstitution(namespace, "rexrov")),
     )
 
-    nodes = [tf2_spawner, gz_spawner, bridge]
+    # Include the Glider launch file if the namespace is "glider_slocum"
+    glider_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("dave_robot_models"),
+                    "launch",
+                    "glider_slocum.launch.py",
+                ]
+            )
+        ),
+        condition=IfCondition(EqualsSubstitution(namespace, "glider_slocum")),
+    )
+
+    include = [rexrov_launch, glider_launch]
 
     event_handlers = [
         RegisterEventHandler(
@@ -145,4 +170,4 @@ def generate_launch_description():
         )
     ]
 
-    return LaunchDescription(args + nodes + event_handlers)
+    return LaunchDescription(args + nodes + event_handlers + include)

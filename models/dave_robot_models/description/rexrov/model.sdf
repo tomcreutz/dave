@@ -64,40 +64,80 @@
           </box>
         </geometry>
       </collision>
+    </link>
 
-      <sensor name="imu_sensor" type="imu">
-        <always_on>true</always_on>
-        <update_rate>1000.0</update_rate>
-        <topic>imu</topic>
-      </sensor>
+    <link name="magnetometer_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.00001</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
 
       <sensor name="magnetometer_sensor" type="magnetometer">
         <always_on>true</always_on>
-        <update_rate>100.0</update_rate>
-        <topic>magnetometer</topic>
+        <update_rate>50.0</update_rate>
+        <topic>/model/rexrov/magnetometer</topic>
         <magnetometer>
           <x>
             <noise type="gaussian">
               <mean>0.0</mean>
-              <stddev>0.1</stddev>
+              <stddev>1.0</stddev>
             </noise>
           </x>
           <y>
             <noise type="gaussian">
               <mean>0.0</mean>
-              <stddev>0.1</stddev>
+              <stddev>1.0</stddev>
             </noise>
           </y>
           <z>
             <noise type="gaussian">
               <mean>0.0</mean>
-              <stddev>0.1</stddev>
+              <stddev>1.4</stddev>
             </noise>
           </z>
         </magnetometer>
       </sensor>
-
     </link>
+
+    <joint name="magnetometer_joint" type="fixed">
+      <pose>0 0 0 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>magnetometer_link</child>
+    </joint>
+
+    <link name="imu_link">
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.00001</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>50.0</update_rate>
+        <topic>/model/rexrov/imu</topic>
+      </sensor>
+    </link>
+
+    <joint name="imu_joint" type="fixed">
+      <pose>0 0 0 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>imu_link</child>
+    </joint>
 
     <link name="dvl_link">
       <pose>-1.34 0 -0.75 0 0 -1.57</pose>
@@ -122,7 +162,7 @@
         <pose>0 0 0 0 0 0</pose>
         <always_on>1</always_on>
         <update_rate>8</update_rate>
-        <topic>/dvl/velocity</topic>
+        <topic>/model/rexrov/dvl/velocity</topic>
         <gz:dvl>
           <type>phased_array</type>
           <arrangement degrees="true">
@@ -257,13 +297,6 @@
       <pose>-1.34 0 -0.75 0 0 -1.57</pose>
       <parent>base_link</parent>
       <child>dvl_link</child>
-      <axis>
-        <xyz>1 0 0</xyz>
-        <limit>
-          <effort>-1</effort>
-          <velocity>-1</velocity>
-        </limit>
-      </axis>
     </joint>
 
     <link name="thruster1">
@@ -772,14 +805,6 @@
     <plugin
       filename="gz-sim-joint-state-publisher-system"
       name="gz::sim::systems::JointStatePublisher">
-      <joint_name>thruster1_joint</joint_name>
-      <joint_name>thruster2_joint</joint_name>
-      <joint_name>thruster3_joint</joint_name>
-      <joint_name>thruster4_joint</joint_name>
-      <joint_name>thruster5_joint</joint_name>
-      <joint_name>thruster6_joint</joint_name>
-      <joint_name>thruster7_joint</joint_name>
-      <joint_name>thruster8_joint</joint_name>
     </plugin>
 
     <!-- Sea Pressure Sensor Plugin -->
@@ -798,7 +823,7 @@
     <plugin
       filename="DVLBridge"
       name="dave_ros_gz_plugins::DVLBridge">
-      <topic>/dvl/velocity</topic>
+      <topic>/model/rexrov/dvl/velocity</topic>
     </plugin>
 
   </model>
