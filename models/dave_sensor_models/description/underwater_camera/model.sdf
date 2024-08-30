@@ -2,9 +2,9 @@
 <?xml version="1.0"?>
 <sdf version="1.6">
   <model name="underwater_camera">
-    <pose>0 0 0 0 0 0</pose>
-    <link name="link">
+    <link name="camera_link">
       <inertial>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.000166667</ixx>
@@ -30,7 +30,7 @@
         <update_rate>10</update_rate>
         <visualize>true</visualize>
         <always_on>1</always_on>
-        <topic>rgbd_camera</topic>
+        <topic>underwater_camera</topic>
         <camera>
           <horizontal_fov>1.05</horizontal_fov>
           <image>
@@ -49,13 +49,16 @@
     <plugin
       filename="UnderwaterCamera"
       name="dave_gz_sensor_plugins::UnderwaterCamera">
-      <topic>rgbd_camera</topic>
-      <attenuationR>0.01</attenuationR>
-      <attenuationG>0.01</attenuationG>
-      <attenuationB>0.003</attenuationB>
-      <backgroundR>0</backgroundR>
-      <backgroundG>0</backgroundG>
-      <backgroundB>0</backgroundB>
+      <topic>underwater_camera</topic>
+      <min_range>0.1</min_range>
+      <max_range>10.0</max_range>
+      <attenuationR>0.8</attenuationR>
+      <attenuationG>0.5</attenuationG>
+      <attenuationB>0.2</attenuationB>
+      <!-- Murky Coastal Waters -->
+      <backgroundR>85</backgroundR>
+      <backgroundG>107</backgroundG>
+      <backgroundB>47</backgroundB>
     </plugin>
 
   </model>

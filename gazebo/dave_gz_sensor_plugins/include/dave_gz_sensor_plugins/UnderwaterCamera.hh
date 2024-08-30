@@ -18,22 +18,22 @@
 #ifndef DAVE_GZ_SENSOR_PLUGINS__UNDERWATERCAMERA_HH_
 #define DAVE_GZ_SENSOR_PLUGINS__UNDERWATERCAMERA_HH_
 
-#include <gz/msgs/image.pb.h>
 #include <gz/msgs/camera_info.pb.h>
-#include <gz/sim/System.hh>
+#include <gz/msgs/image.pb.h>
 #include <gz/math/Angle.hh>
+#include <gz/sim/System.hh>
 #include <memory>
 #include <mutex>
+#include <opencv2/opencv.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
-#include <opencv2/opencv.hpp>
 
 namespace dave_gz_sensor_plugins
 
 {
 class UnderwaterCamera : public gz::sim::System,
-                  public gz::sim::ISystemConfigure,
-                  public gz::sim::ISystemPostUpdate
+                         public gz::sim::ISystemConfigure,
+                         public gz::sim::ISystemPostUpdate
 {
 public:
   UnderwaterCamera();
@@ -52,11 +52,10 @@ public:
 
   void DepthImageCallback(const gz::msgs::Image & image);
 
-  cv::Mat ConvertGazeboToOpenCV(const gz::msgs::Image &gz_image);
+  cv::Mat ConvertGazeboToOpenCV(const gz::msgs::Image & gz_image);
 
   cv::Mat SimulateUnderwater(
-    const cv::Mat& _inputImage, const cv::Mat& _inputDepth,
-    cv::Mat& _outputImage);
+    const cv::Mat & _inputImage, const cv::Mat & _inputDepth, cv::Mat & _outputImage);
 
 private:
   std::shared_ptr<rclcpp::Node> ros_node_;
