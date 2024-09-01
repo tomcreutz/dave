@@ -42,24 +42,20 @@
             <far>10.0</far>
           </clip>
         </camera>
+        <plugin
+          filename="UnderwaterCamera"
+          name="dave_gz_sensor_plugins::UnderwaterCamera">
+          <attenuationR>0.8</attenuationR>
+          <attenuationG>0.5</attenuationG>
+          <attenuationB>0.2</attenuationB>
+          <!-- Murky Coastal Waters -->
+          <backgroundR>85</backgroundR>
+          <backgroundG>107</backgroundG>
+          <backgroundB>47</backgroundB>
+        </plugin>
       </sensor>
     </link>
     <static>true</static>
-
-    <plugin
-      filename="UnderwaterCamera"
-      name="dave_gz_sensor_plugins::UnderwaterCamera">
-      <topic>underwater_camera</topic>
-      <min_range>0.1</min_range>
-      <max_range>10.0</max_range>
-      <attenuationR>0.8</attenuationR>
-      <attenuationG>0.5</attenuationG>
-      <attenuationB>0.2</attenuationB>
-      <!-- Murky Coastal Waters -->
-      <backgroundR>85</backgroundR>
-      <backgroundG>107</backgroundG>
-      <backgroundB>47</backgroundB>
-    </plugin>
 
   </model>
 </sdf>

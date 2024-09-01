@@ -16,9 +16,20 @@
 
 #include "dave_gz_sensor_plugins/UnderwaterCamera.hh"
 #include <gz/common/Console.hh>
+#include <gz/sim/Model.hh>
+#include <gz/sim/Util.hh>
+#include <gz/sim/components/Camera.hh>
+#include <gz/sim/components/ParentEntity.hh>
+#include <gz/sim/components/RgbdCamera.hh>
+#include <gz/sim/components/Sensor.hh>
 #include <gz/transport/Node.hh>
+#include <sdf/Camera.hh>
 #include "gz/plugin/Register.hh"
 #include "gz/sim/EntityComponentManager.hh"
+#include "gz/sim/components/Link.hh"
+#include "gz/sim/components/Model.hh"
+#include "gz/sim/components/Name.hh"
+#include "gz/sim/components/World.hh"
 
 GZ_ADD_PLUGIN(
   dave_gz_sensor_plugins::UnderwaterCamera, gz::sim::System,
@@ -31,6 +42,9 @@ namespace dave_gz_sensor_plugins
 struct UnderwaterCamera::PrivateData
 {
   // Add any private data members here.
+  gz::sim::Model model;
+  std::string linkName;
+
   std::mutex mutex_;
   gz::transport::Node gz_node;
   std::string topic;
@@ -97,22 +111,115 @@ void UnderwaterCamera::Configure(
 
   this->ros_node_ = std::make_shared<rclcpp::Node>("underwater_camera_node");
 
-  // Grab topic from SDF
-  if (!_sdf->HasElement("topic"))
+  auto rgbdCamera = _ecm.Component<gz::sim::components::RgbdCamera>(_entity);
+  if (!rgbdCamera)
   {
-    this->dataPtr->topic = "/underwater_camera";
-    gzmsg << "Camera topic set to default: " << this->dataPtr->topic << std::endl;
+    gzerr << "UnderwaterCamera plugin should be attached to a rgbd_camera sesnsor. "
+          << "Failed to initialize." << std::endl;
+    return;
   }
-  else
+
+  // get world entity
+  auto worldEntity = _ecm.EntityByComponents(gz::sim::components::World());
+  auto worldName = _ecm.Component<gz::sim::components::Name>(worldEntity)->Data();
+
+  auto sensorSdf = rgbdCamera->Data();
+  this->dataPtr->topic = sensorSdf.Topic();
+
+  if (sensorSdf.CameraSensor() == nullptr)
   {
-    this->dataPtr->topic = _sdf->Get<std::string>("topic");
-    gzmsg << "Topic: " << this->dataPtr->image_topic << std::endl;
+    gzerr << "Attempting to a load an RGBD Camera sensor, but received "
+          << "a null sensor." << std::endl;
+    return;
+  }
+
+  if (this->dataPtr->topic.empty())
+  {
+    auto scoped = gz::sim::scopedName(_entity, _ecm);
+    this->dataPtr->topic = "/world/" + worldName + "/" + scoped;
   }
 
   this->dataPtr->image_topic = this->dataPtr->topic + "/image";
   this->dataPtr->depth_image_topic = this->dataPtr->topic + "/depth_image";
   this->dataPtr->simulated_image_topic = this->dataPtr->topic + "/simulated_image";
-  this->dataPtr->camera_info_topic = this->dataPtr->topic + "/camera_info";
+
+  sdf::Camera * cameraSdf = sensorSdf.CameraSensor();
+
+  // get camera intrinsics
+  this->dataPtr->width = cameraSdf->ImageWidth();
+  this->dataPtr->height = cameraSdf->ImageHeight();
+
+  if (this->dataPtr->width == 0 || this->dataPtr->height == 0)
+  {
+    gzerr << "Camera image size is zero" << std::endl;
+    return;
+  }
+
+  this->dataPtr->min_range = cameraSdf->NearClip();
+  this->dataPtr->max_range = cameraSdf->FarClip();
+
+  // Check if min_range and max_range are valid
+  if (this->dataPtr->min_range == 0 || this->dataPtr->max_range == 0)
+  {
+    gzerr << "Invalid min_range or max_range" << std::endl;
+    return;
+  }
+
+  this->dataPtr->fx = cameraSdf->LensIntrinsicsFx();
+  this->dataPtr->fy = cameraSdf->LensIntrinsicsFy();
+  this->dataPtr->cx = cameraSdf->LensIntrinsicsCx();
+  this->dataPtr->cy = cameraSdf->LensIntrinsicsCy();
+
+  // Check if fx and fy are non-zero to avoid division by zero
+  if (this->dataPtr->fx == 0 || this->dataPtr->fy == 0)
+  {
+    gzerr << "Camera intrinsics have zero focal length (fx or fy)" << std::endl;
+    return;
+  }
+
+  // Check if cx, cy are zero. If so, set them to the center of the image
+  if (this->dataPtr->cx == 0)
+  {
+    this->dataPtr->cx = this->dataPtr->width / 2;
+  }
+  if (this->dataPtr->cy == 0)
+  {
+    this->dataPtr->cy = this->dataPtr->height / 2;
+  }
+
+  gzmsg << "Camera intrinsics: fx=" << this->dataPtr->fx << ", fy=" << this->dataPtr->fy
+        << ", cx=" << this->dataPtr->cx << ", cy=" << this->dataPtr->cy << std::endl;
+
+  gzmsg << "Image size: width=" << this->dataPtr->width << ", height=" << this->dataPtr->height
+        << std::endl;
+
+  gzmsg << "Min range: " << this->dataPtr->min_range << ", Max range: " << this->dataPtr->max_range
+        << std::endl;
+
+  // Free previous LUT memory if it was already allocated
+  if (this->dataPtr->depth2rangeLUT)
+  {
+    delete[] this->dataPtr->depth2rangeLUT;
+  }
+
+  // Allocate memory for the new LUT
+  this->dataPtr->depth2rangeLUT = new float[this->dataPtr->width * this->dataPtr->height];
+  float * lutPtr = this->dataPtr->depth2rangeLUT;
+
+  // Fill depth2range LUT
+  for (int v = 0; v < this->dataPtr->height; v++)
+  {
+    double y_z = (v - this->dataPtr->cy) / this->dataPtr->fy;
+    for (int u = 0; u < this->dataPtr->width; u++)
+    {
+      double x_z = (u - this->dataPtr->cx) / this->dataPtr->fx;
+      // Precompute the per-pixel factor in the following formula:
+      // range = || (x, y, z) ||_2
+      // range = || z * (x/z, y/z, 1.0) ||_2
+      // range = z * || (x/z, y/z, 1.0) ||_2
+      *(lutPtr++) = sqrt(1.0 + x_z * x_z + y_z * y_z);
+    }
+  }
 
   if (!_sdf->HasElement("attenuationR"))
   {
@@ -168,35 +275,11 @@ void UnderwaterCamera::Configure(
     this->dataPtr->background[2] = (unsigned char)_sdf->Get<int>("backgroundB");
   }
 
-  if (!_sdf->HasElement("min_range"))
-  {
-    this->dataPtr->min_range = 0.01f;
-  }
-  else
-  {
-    this->dataPtr->min_range = _sdf->Get<float>("min_range");
-  }
-
-  if (!_sdf->HasElement("max_range"))
-  {
-    this->dataPtr->max_range = 10.0f;
-  }
-  else
-  {
-    this->dataPtr->max_range = _sdf->Get<float>("max_range");
-  }
-
   // Gazebo camera subscriber
   std::function<void(const gz::msgs::Image &)> camera_callback =
     std::bind(&UnderwaterCamera::CameraCallback, this, std::placeholders::_1);
 
   this->dataPtr->gz_node.Subscribe(this->dataPtr->image_topic, camera_callback);
-
-  // Gazebo camera info subscriber
-  std::function<void(const gz::msgs::CameraInfo &)> camera_info_callback =
-    std::bind(&UnderwaterCamera::CameraInfoCallback, this, std::placeholders::_1);
-
-  this->dataPtr->gz_node.Subscribe(this->dataPtr->camera_info_topic, camera_info_callback);
 
   // Gazebo depth image subscriber
   std::function<void(const gz::msgs::Image &)> depth_callback =
@@ -207,74 +290,6 @@ void UnderwaterCamera::Configure(
   // ROS2 publisher
   this->dataPtr->image_pub = this->ros_node_->create_publisher<sensor_msgs::msg::Image>(
     this->dataPtr->simulated_image_topic, 1);
-}
-
-void UnderwaterCamera::CameraInfoCallback(const gz::msgs::CameraInfo & msg)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex_);
-
-  gzmsg << "dave_gz_sensor_plugins::UnderwaterCamera::CameraInfoCallback" << std::endl;
-
-  if (msg.width() == 0 || msg.height() == 0)
-  {
-    gzerr << "CameraInfo is empty" << std::endl;
-    return;
-  }
-
-  this->dataPtr->width = msg.width();
-  this->dataPtr->height = msg.height();
-
-  // Check if intrinsics are correctly provided
-  if (msg.intrinsics().k().size() < 9)
-  {
-    gzerr << "Invalid camera intrinsics" << std::endl;
-    return;
-  }
-
-  this->dataPtr->fx = msg.intrinsics().k().data()[0];
-  this->dataPtr->fy = msg.intrinsics().k().data()[4];
-  this->dataPtr->cx = msg.intrinsics().k().data()[2];
-  this->dataPtr->cy = msg.intrinsics().k().data()[5];
-
-  // Check if fx and fy are non-zero to avoid division by zero
-  if (this->dataPtr->fx == 0 || this->dataPtr->fy == 0)
-  {
-    gzerr << "Camera intrinsics have zero focal length (fx or fy)" << std::endl;
-    return;
-  }
-
-  // print camera intrinsics
-  gzmsg << "Camera intrinsics: fx=" << this->dataPtr->fx << ", fy=" << this->dataPtr->fy
-        << ", cx=" << this->dataPtr->cx << ", cy=" << this->dataPtr->cy << std::endl;
-
-  // print image size
-  gzmsg << "Image size: width=" << this->dataPtr->width << ", height=" << this->dataPtr->height
-        << std::endl;
-
-  // Free previous LUT memory if it was already allocated
-  if (this->dataPtr->depth2rangeLUT)
-  {
-    delete[] this->dataPtr->depth2rangeLUT;
-  }
-
-  // Allocate memory for the new LUT
-  this->dataPtr->depth2rangeLUT = new float[this->dataPtr->width * this->dataPtr->height];
-  float * lutPtr = this->dataPtr->depth2rangeLUT;
-
-  // Fill depth2range LUT
-  for (int v = 0; v < this->dataPtr->height; v++)
-  {
-    double y_z = (v - this->dataPtr->cy) / this->dataPtr->fy;
-    for (int u = 0; u < this->dataPtr->width; u++)
-    {
-      double x_z = (u - this->dataPtr->cx) / this->dataPtr->fx;
-      // Precompute the per-pixel factor in the following formula:
-      // range = || (x, y, z) ||_2
-      // range = || z * (x/z, y/z, 1.0) ||_2
-      // range = z * || (x/z, y/z, 1.0) ||_2
-      *(lutPtr++) = sqrt(1.0 + x_z * x_z + y_z * y_z);
-    }
-  }
 }
 
 cv::Mat UnderwaterCamera::ConvertGazeboToOpenCV(const gz::msgs::Image & gz_image)
