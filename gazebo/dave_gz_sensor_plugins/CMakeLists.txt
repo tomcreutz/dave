@@ -81,7 +81,12 @@ ament_target_dependencies(UnderwaterCamera
 )
 
 # Install targets
-install(TARGETS UsblTransceiver UsblTransponder sea_pressure_sensor UnderwaterCamera
+install(
+  TARGETS
+    UsblTransceiver
+    UsblTransponder
+    sea_pressure_sensor
+    UnderwaterCamera
   DESTINATION lib/${PROJECT_NAME}
 )
 
