@@ -1,19 +1,15 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 
 
-def generate_launch_description():
+def launch_setup(context, *args, **kwargs):
+    namespace = LaunchConfiguration("namespace").perform(context)
 
-    thruster_joints = [
-        "/model/rexrov/joint/thruster1_joint",
-        "/model/rexrov/joint/thruster2_joint",
-        "/model/rexrov/joint/thruster3_joint",
-        "/model/rexrov/joint/thruster4_joint",
-        "/model/rexrov/joint/thruster5_joint",
-        "/model/rexrov/joint/thruster6_joint",
-        "/model/rexrov/joint/thruster7_joint",
-        "/model/rexrov/joint/thruster8_joint",
-    ]
+    thruster_joints = []
+    for thruster in range(1, 9):
+        thruster_joints.append(f"/model/{namespace}/joint/thruster{thruster}_joint")
 
     rexrov_arguments = (
         [f"{joint}/cmd_thrust@std_msgs/msg/Float64@gz.msgs.Double" for joint in thruster_joints]
@@ -23,11 +19,11 @@ def generate_launch_description():
             for joint in thruster_joints
         ]
         + [
-            "/model/rexrov/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry",
-            "/model/rexrov/odometry_with_covariance@nav_msgs/msg/Odometry@gz.msgs.OdometryWithCovariance",
-            "/model/rexrov/pose@geometry_msgs/msg/PoseArray@gz.msgs.Pose_V",
-            "/model/rexrov/imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
-            "/model/rexrov/magnetometer@sensor_msgs/msg/MagneticField@gz.msgs.Magnetometer",
+            f"/model/{namespace}/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry",
+            f"/model/{namespace}/odometry_with_covariance@nav_msgs/msg/Odometry@gz.msgs.OdometryWithCovariance",
+            f"/model/{namespace}/pose@geometry_msgs/msg/PoseArray@gz.msgs.Pose_V",
+            f"/model/{namespace}/imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
+            f"/model/{namespace}/magnetometer@sensor_msgs/msg/MagneticField@gz.msgs.Magnetometer",
         ]
     )
 
@@ -38,4 +34,16 @@ def generate_launch_description():
         output="screen",
     )
 
-    return LaunchDescription([rexrov_bridge])
+    return [rexrov_bridge]
+
+
+def generate_launch_description():
+    args = [
+        DeclareLaunchArgument(
+            "namespace",
+            default_value="",
+            description="Namespace",
+        ),
+    ]
+
+    return LaunchDescription(args + [OpaqueFunction(function=launch_setup)])
