@@ -44,6 +44,11 @@ ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
+# Install Ardusub
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
+extras/ardusub-ubuntu-install.sh install.sh
+RUN bash install.sh
+
 # Set up Dave workspace
 ENV DAVE_WS=/opt/ws_dave
 WORKDIR $DAVE_WS/src
@@ -66,11 +71,6 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
 RUN touch /ros_entrypoint.sh && sed --in-place --expression \
     '$i source "/opt/ws_dave/install/setup.bash"' /ros_entrypoint.sh
 
-# Install Ardusub
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
-extras/ardusub-ubuntu-install.sh install.sh
-RUN bash install.sh
-
 # Source ROS and Gazebo
 RUN sed --in-place --expression \
 '$i source "/opt/ros/jazzy/setup.bash"' /ros_entrypoint.sh && \
@@ -79,13 +79,13 @@ sed --in-place --expression \
 sed --in-place --expression \
 '$i export PYTHONPATH=$PYTHONPATH:/opt/gazebo/install/lib/python' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i export PATH=/opt/ardupilot_dave/ardupilot/build/sitl/bin:$PATH' /ros_entrypoint.sh && \
+'$i export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:$PATH' /ros_entrypoint.sh && \
 sed --in-place --expression \
 '$i export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:$PATH' /ros_entrypoint.sh && \
 sed --in-place --expression \
 '$i export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:$GZ_SIM_SYSTEM_PLUGIN_PATH' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH' /ros_entrypoint.sh 
+'$i export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH' /ros_entrypoint.sh
 
 # Set User as user
 USER $USER

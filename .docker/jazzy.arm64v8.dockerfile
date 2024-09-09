@@ -81,6 +81,16 @@
 FROM --platform=linux/arm64 woensugchoi/ubuntu-arm-rdp-base:latest
 ARG USER=docker
 
+# Install packages (added for Ardusub)
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
+# hadolint ignore=DL3008
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python-is-python3 python3-future python3-wxgtk4.0 \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    rm -rf /var/lib/apt/lists/
+
 # ROS-Gazebo arg
 ARG BRANCH="ros2"
 ARG ROS_DISTRO="jazzy"
@@ -88,6 +98,11 @@ ARG ROS_DISTRO="jazzy"
 # Install ROS-Gazebo framework
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
+RUN bash install.sh
+
+# Install Ardusub
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
+extras/ardusub-ubuntu-install.sh install.sh
 RUN bash install.sh
 
 # Set up Dave workspace
@@ -131,6 +146,10 @@ USER docker
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
     echo "source /opt/gazebo/install/setup.bash" >> ~/.bashrc && \
     echo "export PYTHONPATH=$PYTHONPATH:/opt/gazebo/install/lib/python" >> ~/.bashrc && \
+    echo "export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:$PATH" >> ~/.bashrc && \
+    echo "export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:$PATH" >> ~/.bashrc && \
+    echo "export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:$GZ_SIM_SYSTEM_PLUGIN_PATH" >> ~/.bashrc && \
+    echo "export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH" >> ~/.bashrc && \
     echo "if [ -d ~/HOST ]; then chown docker:docker ~/HOST; fi" \
     >> ~/.bashrc
 

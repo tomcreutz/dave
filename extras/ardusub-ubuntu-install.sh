@@ -19,7 +19,7 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
 cd "/opt/ardupilot_dave/ardupilot" || exit
 # needs python binary (e.g. sudo apt install python-is-python3)
 apt-get install -y python-is-python3 python3-future
-modules/waf/waf-light configure --board sitl \
+modules/waf/waf-light configure --board still \
     && modules/waf/waf-light build --target bin/ardusub
 
 # Clone ardupilot_gazebo code
@@ -32,10 +32,10 @@ mkdir -p "/opt/ardupilot_dave/ardupilot_gazebo/build" \
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && make -j2
 
 # Add results of ArduSub build
-export PATH=/opt/ardupilot_dave/ardupilot/build/sitl/bin:\$PATH
+export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:\$PATH
 # Optional: add autotest to the PATH, helpful for running sim_vehicle.py
 export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:\$PATH
 # Add ardupilot_gazebo plugin
 export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:\$GZ_SIM_SYSTEM_PLUGIN_PATH
 # Add ardupilot_gazebo models and worlds
-export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH
+export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH
