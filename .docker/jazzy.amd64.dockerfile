@@ -11,6 +11,8 @@ RUN apt-get update && \
     gnupg libeigen3-dev libgles2-mesa-dev \
     lsb-release pkg-config protobuf-compiler \
     python3-dbg python3-pip python3-venv \
+    python-is-python3 python3-future python3-wxgtk4.0 \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     qtbase5-dev ruby dirmngr gnupg2 nano xauth \
     software-properties-common htop libtool \
     x11-apps mesa-utils bison flex automake && \
@@ -64,13 +66,26 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
 RUN touch /ros_entrypoint.sh && sed --in-place --expression \
     '$i source "/opt/ws_dave/install/setup.bash"' /ros_entrypoint.sh
 
+# Install Ardusub
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
+extras/ardusub-ubuntu-install.sh install.sh
+RUN bash install.sh
+
 # Source ROS and Gazebo
 RUN sed --in-place --expression \
 '$i source "/opt/ros/jazzy/setup.bash"' /ros_entrypoint.sh && \
 sed --in-place --expression \
 '$i source "/opt/gazebo/install/setup.bash"' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i export PYTHONPATH=$PYTHONPATH:/opt/gazebo/install/lib/python' /ros_entrypoint.sh
+'$i export PYTHONPATH=$PYTHONPATH:/opt/gazebo/install/lib/python' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i export PATH=/opt/ardupilot_dave/ardupilot/build/sitl/bin:$PATH' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:$PATH' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:$GZ_SIM_SYSTEM_PLUGIN_PATH' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH' /ros_entrypoint.sh 
 
 # Set User as user
 USER $USER
