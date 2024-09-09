@@ -87,7 +87,7 @@ ENV DEBCONF_NONINTERACTIVE_SEEN=true
 # hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    python-is-python3 python3-future python3-wxgtk4.0 \
+    python-is-python3 python3-future python3-wxgtk4.0 python3-pexpect \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     && rm -rf /var/lib/apt/lists/
 
