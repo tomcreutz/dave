@@ -45,7 +45,7 @@ extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
 # Install Ardusub
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
 extras/ardusub-ubuntu-install.sh install.sh
 RUN bash install.sh
 

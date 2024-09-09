@@ -101,7 +101,7 @@ extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
 # Install Ardusub
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
 extras/ardusub-ubuntu-install.sh install.sh
 RUN bash install.sh
 
@@ -162,7 +162,7 @@ RUN mkdir -p /home/docker/.config/autostart && \
     printf '\033[1;32m\n =====\n\033[0m' >> ~/.hi && \
     printf "\\033[1;32m 👋 Hi! This is Docker virtual environment\n\\033[0m" \
     >> ~/.hi && \
-    printf "\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic\n\n\n\\033[0m" \
+    printf "\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic (w ardusub)\n\n\n\\033[0m" \
     >> ~/.hi
 
 # Remove sudo message
