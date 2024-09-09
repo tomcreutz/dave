@@ -10,7 +10,7 @@ RUN apt-get update && \
     curl wget git build-essential cmake cppcheck \
     gnupg libeigen3-dev libgles2-mesa-dev \
     lsb-release pkg-config protobuf-compiler \
-    python3-dbg python3-pip python3-venv \
+    python3-dbg python3-pip python3-venv python3-pexpect \
     python-is-python3 python3-future python3-wxgtk4.0 \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     qtbase5-dev ruby dirmngr gnupg2 nano xauth \
