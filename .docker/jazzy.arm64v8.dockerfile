@@ -126,7 +126,7 @@ RUN rosdep init && \
 
 # hadolint ignore=DL3027
 RUN apt update && apt --fix-broken install && \
-    rosdep update &&  rosdep install -iy --from-paths . && \
+    rosdep update && rosdep install -iy --from-paths . && \
     rm -rf /var/lib/apt/lists/
 
 WORKDIR $ROS_UNDERLAY/..
