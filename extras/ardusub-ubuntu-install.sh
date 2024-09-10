@@ -32,10 +32,10 @@ cd "/opt/ardupilot_dave/ardupilot" || exit
 # needs python binary (e.g. sudo apt install python-is-python3)
 mkdir -p "/opt/ardupilot_dave/ardupilot/mktest" 2>/dev/null
 if [ $? -ne 0 ]; then
-  sudo modules/waf/waf-light configure --board still \
+  sudo modules/waf/waf-light configure --board sitl \
     && sudo modules/waf/waf-light build --target bin/ardusub
 else
-  modules/waf/waf-light configure --board still \
+  modules/waf/waf-light configure --board sitl \
     && modules/waf/waf-light build --target bin/ardusub
 fi
 
@@ -62,7 +62,7 @@ else
 fi
 
 # Add results of ArduSub build
-export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:\$PATH
+export PATH=/opt/ardupilot_dave/ardupilot/build/sitl/bin:\$PATH
 # Optional: add autotest to the PATH, helpful for running sim_vehicle.py
 export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:\$PATH
 # Add ardupilot_gazebo plugin
