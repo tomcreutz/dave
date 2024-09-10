@@ -78,20 +78,8 @@
 
 # Using the pre-built image for above commented out dockerfile code lines
 # hadolint ignore=DL3007
-FROM --platform=linux/arm64 woensugchoi/ubuntu-arm-rdp-base:latest
+FROM woensugchoi/ubuntu-arm-rdp-base:latest
 ARG USER=docker
-
-# Install packages (added for Ardusub)
-ENV DEBIAN_FRONTEND=noninteractive
-ENV DEBCONF_NONINTERACTIVE_SEEN=true
-# hadolint ignore=DL3008
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    python-is-python3 python3-future python3-wxgtk4.0 python3-pexpect \
-    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-    libgz-sim8-dev rapidjson-dev libopencv-dev \
-    gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
-    && rm -rf /var/lib/apt/lists/
 
 # ROS-Gazebo arg
 ARG BRANCH="ros2"
@@ -103,6 +91,16 @@ extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
 # Install Ardusub
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
+# hadolint ignore=DL3008
+RUN apt-get -q update && \
+    apt-get install -y --no-install-recommends \
+    python-is-python3 python3-future python3-wxgtk4.0 python3-pexpect \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    libgz-sim8-dev rapidjson-dev libopencv-dev \
+    gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
+    && rm -rf /var/lib/apt/lists/
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
 extras/ardusub-ubuntu-install.sh install.sh
 RUN bash install.sh
