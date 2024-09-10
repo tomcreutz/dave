@@ -4,7 +4,10 @@ ARG BRANCH="ros2"
 
 # Install Utilities
 # hadolint ignore=DL3008
-RUN apt-get update && \
+ADD --chown=root:root --chmod=0644 https://raw.githubusercontent.com/osrf/osrf-rosdep/master/gz/00-gazebo.list /etc/ros/rosdep/sources.list.d/00-gazebo.list
+RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" |  tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
+    && apt-get update && \
     apt-get install -y --no-install-recommends \
     sudo xterm init systemd snapd vim net-tools \
     curl wget git build-essential cmake cppcheck \
