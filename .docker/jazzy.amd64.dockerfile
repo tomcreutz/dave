@@ -54,11 +54,11 @@ extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
 # Install Ardupilot - Ardusub
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
 extras/ardusub-ubuntu-install.sh install.sh
 RUN bash install.sh
 # Install mavros
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
 extras/mavros-ubuntu-install.sh install.sh
 RUN bash install.sh
 

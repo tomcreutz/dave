@@ -105,11 +105,11 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
     gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
     && rm -rf /var/lib/apt/lists/
 # Install Ardupilot - Ardusub
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
 extras/ardusub-ubuntu-install.sh install.sh
 RUN bash install.sh
 # Install mavros
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
 extras/mavros-ubuntu-install.sh install.sh
 RUN bash install.sh
 
