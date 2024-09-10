@@ -14,16 +14,49 @@ else
     && sudo ./install_geographiclib_datasets.sh
 fi
 
+# Manually install MAVROS from source
+export MAVROS_RELEASE=ros2
+export MAVLINK_RELEASE=release/rolling/mavlink
+mkdir -p "/opt/mavros/src" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo "Insufficient privileges to create directory in /opt."
+  sudo mkdir -p "/opt/mavros/src" && cd "/opt/mavros/src" || exit
+  sudo git clone --depth 1 -b $MAVROS_RELEASE https://github.com/mavlink/mavros.git
+  sudo git clone --depth 1 --recursive -b $MAVLINK_RELEASE https://github.com/mavlink/mavlink-gbp-release.git mavlink
+  # - mavgen uses future.standard_library for backwards compatibility with Python2;
+  #   However, this caused issues with Python 3.12 installed in "noble".
+  #   Comment those lines out in mavlink.
+  #
+  # - Fix linkage for yaml-cpp in mavros_extra_plugins
+  sudo sed -i -e 's/^from future import standard_library/#from future import standard_library/' \
+  -e 's/standard_library.install_aliases()/#standard_library.install_aliases()/' \
+  mavlink/pymavlink/generator/mavgen.py && \
+  sudo sed -i -e 's/^# find_package(yaml_cpp REQUIRED)/find_package(yaml-cpp REQUIRED)/' \
+  -e '/^ament_target_dependencies(mavros_extras_plugins$/i target_link_libraries(mavros_extras_plugins yaml-cpp::yaml-cpp)' \
+  -e '/^ament_target_dependencies(mavros_extras$/i target_link_libraries(mavros_extras yaml-cpp::yaml-cpp)' \
+  mavros/mavros_extras/CMakeLists.txt
+else
+  cd "/opt/mavros/src" || exit
+  git clone --depth 1 -b $MAVROS_RELEASE https://github.com/mavlink/mavros.git
+  git clone --depth 1 --recursive -b $MAVLINK_RELEASE https://github.com/mavlink/mavlink-gbp-release.git mavlink
+  # - mavgen uses future.standard_library for backwards compatibility with Python2;
+  #   However, this caused issues with Python 3.12 installed in "noble".
+  #   Comment those lines out in mavlink.
+  #
+  # - Fix linkage for yaml-cpp in mavros_extra_plugins
+  sed -i -e 's/^from future import standard_library/#from future import standard_library/' \
+  -e 's/standard_library.install_aliases()/#standard_library.install_aliases()/' \
+  mavlink/pymavlink/generator/mavgen.py && \
+  sed -i -e 's/^# find_package(yaml_cpp REQUIRED)/find_package(yaml-cpp REQUIRED)/' \
+  -e '/^ament_target_dependencies(mavros_extras_plugins$/i target_link_libraries(mavros_extras_plugins yaml-cpp::yaml-cpp)' \
+  -e '/^ament_target_dependencies(mavros_extras$/i target_link_libraries(mavros_extras yaml-cpp::yaml-cpp)' \
+  mavros/mavros_extras/CMakeLists.txt
+fi
+# Build
+cd "/opt/mavros" || exit
+MAKEFLAGS="-j2" colcon build --cmake-args -DBUILD_TESTING=OFF
 
 
-
-
-
-# # Add results of ArduSub build
-# export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:\$PATH
-# # Optional: add autotest to the PATH, helpful for running sim_vehicle.py
-# export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:\$PATH
-# # Add ardupilot_gazebo plugin
-# export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:\$GZ_SIM_SYSTEM_PLUGIN_PATH
-# # Add ardupilot_gazebo models and worlds
-# export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH
+# Source mavros
+# shellcheck disable=SC1091
+source /opt/mavros/install/setup.bash

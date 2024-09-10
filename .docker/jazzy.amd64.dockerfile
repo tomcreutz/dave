@@ -17,6 +17,7 @@ RUN apt-get update && \
     x11-apps mesa-utils bison flex automake \
     && rm -rf /var/lib/apt/lists/
 
+# Prereqs for Ardupilot - Ardusub
 ADD --chown=root:root --chmod=0644 https://raw.githubusercontent.com/osrf/osrf-rosdep/master/gz/00-gazebo.list /etc/ros/rosdep/sources.list.d/00-gazebo.list
 RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" |  tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
@@ -52,9 +53,13 @@ ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
-# Install Ardusub
+# Install Ardupilot - Ardusub
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
 extras/ardusub-ubuntu-install.sh install.sh
+RUN bash install.sh
+# Install mavros
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
+extras/mavros-ubuntu-install.sh install.sh
 RUN bash install.sh
 
 # Set up Dave workspace

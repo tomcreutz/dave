@@ -90,7 +90,7 @@ ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/ros-jazzy-binary-gz-harmonic-source-install.sh install.sh
 RUN bash install.sh
 
-# Install Ardusub
+# Prereqs for Ardupilot - Ardusub
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN=true
 # hadolint ignore=DL3008
@@ -104,8 +104,13 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
     libgz-sim8-dev rapidjson-dev libopencv-dev \
     gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
     && rm -rf /var/lib/apt/lists/
+# Install Ardupilot - Ardusub
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
 extras/ardusub-ubuntu-install.sh install.sh
+RUN bash install.sh
+# Install mavros
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/dockertest/\
+extras/mavros-ubuntu-install.sh install.sh
 RUN bash install.sh
 
 # Set up Dave workspace
