@@ -89,6 +89,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     python-is-python3 python3-future python3-wxgtk4.0 python3-pexpect \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    libgz-sim8-dev rapidjson-dev libopencv-dev \
+    gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
     && rm -rf /var/lib/apt/lists/
 
 # ROS-Gazebo arg
@@ -110,8 +112,8 @@ ENV ROS_UNDERLAY=/home/$USER/dave_ws/install
 WORKDIR $ROS_UNDERLAY/../src
 
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-extras/repos/dave.$ROS_DISTRO.repos /home/$USER/ws_dave/dave.repos
-RUN vcs import --shallow --input "/home/$USER/ws_dave/dave.repos"
+extras/repos/dave.$ROS_DISTRO.repos /home/$USER/dave_ws/dave.repos
+RUN vcs import --shallow --input "/home/$USER/dave_ws/dave.repos"
 
 RUN rosdep init && \
   rosdep update --rosdistro $ROS_DISTRO
@@ -145,13 +147,13 @@ RUN touch /ros_entrypoint.sh && sed --in-place --expression \
 USER docker
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
     echo "source /opt/gazebo/install/setup.bash" >> ~/.bashrc && \
-    echo "export PYTHONPATH=$PYTHONPATH:/opt/gazebo/install/lib/python" >> ~/.bashrc && \
-    echo "export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:$PATH" >> ~/.bashrc && \
-    echo "export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:$PATH" >> ~/.bashrc && \
-    echo "export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:$GZ_SIM_SYSTEM_PLUGIN_PATH" >> ~/.bashrc && \
-    echo "export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH" >> ~/.bashrc && \
-    echo "if [ -d ~/HOST ]; then chown docker:docker ~/HOST; fi" \
-    >> ~/.bashrc
+    echo "export PYTHONPATH=\$PYTHONPATH:/opt/gazebo/install/lib/python" >> ~/.bashrc && \
+    echo "export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:\$PATH" >> ~/.bashrc && \
+    echo "export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:\$PATH" >> ~/.bashrc && \
+    echo "export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:\$GZ_SIM_SYSTEM_PLUGIN_PATH" >> ~/.bashrc && \
+    echo "export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH" >> ~/.bashrc && \&& \
+    echo "\n\n" >> ~/.bashrc && echo "if [ -d ~/HOST ]; then chown docker:docker ~/HOST; fi" >> ~/.bashrc  && \
+    echo "\n\n" >> ~/.bashrc
 
 # Other environment variables
 RUN echo "export XDG_RUNTIME_DIR=~/.xdg_log" >> ~/.bashrc && \
