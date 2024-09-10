@@ -90,6 +90,8 @@ RUN sed --in-place --expression \
 sed --in-place --expression \
 '$i source "/opt/gazebo/install/setup.bash"' /ros_entrypoint.sh && \
 sed --in-place --expression \
+'$i source "/opt/mavros/install/setup.bash"' /ros_entrypoint.sh && \
+sed --in-place --expression \
 '$i export PYTHONPATH=\$PYTHONPATH:/opt/gazebo/install/lib/python' /ros_entrypoint.sh && \
 sed --in-place --expression \
 '$i export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:\$PATH' /ros_entrypoint.sh && \
@@ -104,6 +106,7 @@ sed --in-place --expression \
 USER $USER
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc  && \
     echo "source /opt/gazebo/install/setup.bash" >> ~/.bashrc && \
+    echo "source /opt/mavros/install/setup.bash" >> ~/.bashrc && \
     echo "export PYTHONPATH=\$PYTHONPATH:/opt/gazebo/install/lib/python" >> ~/.bashrc && \
     echo "export PATH=/opt/ardupilot_dave/ardupilot/build/still/bin:\$PATH" >> ~/.bashrc && \
     echo "export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:\$PATH" >> ~/.bashrc && \
