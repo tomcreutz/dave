@@ -25,7 +25,7 @@ vcs import --force --shallow --retry 0 \
 apt update && apt install libasio-dev libtinyxml2-dev -y
 
 # Build
-MAKEFLAGS="-j2" ROS_PYTHON_VERSION=3 colcon build --cmake-args -DCMAKE_MODULE_PATH=/usr/local/share/cmake/GeographicLib:\$CMAKE_MODULE_PATH -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
+MAKEFLAGS="-j2" ROS_PYTHON_VERSION=3 colcon build --cmake-args -DCMAKE_MODULE_PATH=/usr/local/share/cmake/GeographicLib:\$CMAKE_MODULE_PATH -Wno-dev -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
 
 # Source mavros
 # shellcheck disable=SC1091
