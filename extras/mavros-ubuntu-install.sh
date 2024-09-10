@@ -1,18 +1,27 @@
 #!/bin/bash
 
-mkdir -p "/opt/mavros" 2>/dev/null
+mkdir -p "/opt/mavros/GeographicLib" 2>/dev/null
 if [ $? -ne 0 ]; then
   echo "Insufficient privileges to create directory in /opt."
-  sudo mkdir -p "/opt/mavros" && cd "/opt/mavros" || exit
-  sudo wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \
-    && chmod +x install_geographiclib_datasets.sh \
-    && sudo ./install_geographiclib_datasets.sh
+  sudo mkdir -p "/opt/mavros/" && cd "/opt/mavros/" || exit
+  sudo wget https://github.com/ObjSal/GeographicLib/archive/refs/tags/v1.44.tar.gz && \
+      sudo tar xfpz v1.44.tar.gz && sudo rm v1.44.tar.gz && sudo mv GeographicLib-1.44 GeographicLib
+  sudo mkdir -p GeographicLib/BUILD && cd GeographicLib/BUILD || exit
+  sudo ../configure && sudo make -j2 && sudo make install
+  sudo geographiclib-get-geoids egm96-5
+  sudo geographiclib-get-gravity egm96
+  sudo geographiclib-get-magnetic emm2015
 else
-  cd "/opt/mavros" || exit
-  wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \
-    && chmod +x install_geographiclib_datasets.sh \
-    && sudo ./install_geographiclib_datasets.sh
+  cd "/opt/mavros/" || exit
+  wget https://github.com/ObjSal/GeographicLib/archive/refs/tags/v1.44.tar.gz && \
+      tar xfpz v1.44.tar.gz && rm v1.44.tar.gz && mv GeographicLib-1.44 GeographicLib
+  mkdir -p GeographicLib/BUILD && cd GeographicLib/BUILD || exit
+  ../configure && make -j2 && make install
+  geographiclib-get-geoids egm96-5
+  geographiclib-get-gravity egm96
+  geographiclib-get-magnetic emm2015
 fi
+export GEOGRAPHICLIB_GEOID_PATH=/usr/local/share/GeographicLib
 
 # Manually install MAVROS from source
 export MAVROS_RELEASE=ros2
@@ -20,42 +29,17 @@ export MAVLINK_RELEASE=release/rolling/mavlink
 mkdir -p "/opt/mavros/src" 2>/dev/null
 if [ $? -ne 0 ]; then
   echo "Insufficient privileges to create directory in /opt."
-  sudo mkdir -p "/opt/mavros/src" && cd "/opt/mavros/src" || exit
-  sudo git clone --depth 1 -b $MAVROS_RELEASE https://github.com/mavlink/mavros.git
-  sudo git clone --depth 1 --recursive -b $MAVLINK_RELEASE https://github.com/mavlink/mavlink-gbp-release.git mavlink
-  # - mavgen uses future.standard_library for backwards compatibility with Python2;
-  #   However, this caused issues with Python 3.12 installed in "noble".
-  #   Comment those lines out in mavlink.
-  #
-  # - Fix linkage for yaml-cpp in mavros_extra_plugins
-  sudo sed -i -e 's/^from future import standard_library/#from future import standard_library/' \
-  -e 's/standard_library.install_aliases()/#standard_library.install_aliases()/' \
-  mavlink/pymavlink/generator/mavgen.py && \
-  sudo sed -i -e 's/^# find_package(yaml_cpp REQUIRED)/find_package(yaml-cpp REQUIRED)/' \
-  -e '/^ament_target_dependencies(mavros_extras_plugins$/i target_link_libraries(mavros_extras_plugins yaml-cpp::yaml-cpp)' \
-  -e '/^ament_target_dependencies(mavros_extras$/i target_link_libraries(mavros_extras yaml-cpp::yaml-cpp)' \
-  mavros/mavros_extras/CMakeLists.txt
+  sudo mkdir -p "/opt/mavros/src" && cd "/opt/mavros" || exit
+  sudo vcs import --force --shallow --retry 0 \
+          --input https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/extras/repos/mavros.jazzy.repos src
+  # Build
+  MAKEFLAGS="-j2" ROS_PYTHON_VERSION=3 sudo colcon build --cmake-args -DCMAKE_MODULE_PATH=/usr/local/share/cmake/GeographicLib:\$CMAKE_MODULE_PATH -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
 else
-  cd "/opt/mavros/src" || exit
-  git clone --depth 1 -b $MAVROS_RELEASE https://github.com/mavlink/mavros.git
-  git clone --depth 1 --recursive -b $MAVLINK_RELEASE https://github.com/mavlink/mavlink-gbp-release.git mavlink
-  # - mavgen uses future.standard_library for backwards compatibility with Python2;
-  #   However, this caused issues with Python 3.12 installed in "noble".
-  #   Comment those lines out in mavlink.
-  #
-  # - Fix linkage for yaml-cpp in mavros_extra_plugins
-  sed -i -e 's/^from future import standard_library/#from future import standard_library/' \
-  -e 's/standard_library.install_aliases()/#standard_library.install_aliases()/' \
-  mavlink/pymavlink/generator/mavgen.py && \
-  sed -i -e 's/^# find_package(yaml_cpp REQUIRED)/find_package(yaml-cpp REQUIRED)/' \
-  -e '/^ament_target_dependencies(mavros_extras_plugins$/i target_link_libraries(mavros_extras_plugins yaml-cpp::yaml-cpp)' \
-  -e '/^ament_target_dependencies(mavros_extras$/i target_link_libraries(mavros_extras yaml-cpp::yaml-cpp)' \
-  mavros/mavros_extras/CMakeLists.txt
+  vcs import --force --shallow --retry 0 \
+          --input https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/extras/repos/mavros.jazzy.repos src
+  # Build
+  MAKEFLAGS="-j2" ROS_PYTHON_VERSION=3 colcon build --cmake-args -DCMAKE_MODULE_PATH=/usr/local/share/cmake/GeographicLib:\$CMAKE_MODULE_PATH -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
 fi
-# Build
-cd "/opt/mavros" || exit
-MAKEFLAGS="-j2" colcon build --cmake-args -DBUILD_TESTING=OFF
-
 
 # Source mavros
 # shellcheck disable=SC1091

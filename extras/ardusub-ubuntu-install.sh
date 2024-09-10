@@ -43,8 +43,10 @@ fi
 cd "/opt/ardupilot_dave" || exit
 mkdir -p "/opt/ardupilot_dave/ardupilot_gazebo" 2>/dev/null
 if [ $? -ne 0 ]; then
+  cd "/opt/ardupilot_dave" || exit
   sudo git clone https://github.com/ArduPilot/ardupilot_gazebo.git
 else
+  cd "/opt/ardupilot_dave" || exit
   git clone https://github.com/ArduPilot/ardupilot_gazebo.git
 fi
 
