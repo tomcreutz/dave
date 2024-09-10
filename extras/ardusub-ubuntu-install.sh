@@ -1,22 +1,16 @@
 #!/bin/bash
 
-mkdir -p "/opt/ardupilot_dave" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo "Insufficient privileges to create directory in /opt."
-  sudo mkdir -p "/opt/ardupilot_dave" && cd "/opt/ardupilot_dave" || exit
-else
-  mkdir -p "/opt/ardupilot_dave" && cd "/opt/ardupilot_dave" || exit
-fi
+# Source Ros and Gazebo
+# shellcheck source=/dev/null
+source /opt/ros/jazzy/setup.bash
+# shellcheck source=/dev/null
+source /opt/gazebo/install/setup.bash
 
 # Really should do version pinning but Sub-4.5 is waaaay behind master
 # (e.g. it doesn't know about "noble" yet)
 export ARDUPILOT_RELEASE=master
-mkdir -p "/opt/ardupilot_dave/ardupilot" 2>/dev/null
-if [ $? -ne 0 ]; then
-  sudo git clone -b $ARDUPILOT_RELEASE https://github.com/ArduPilot/ardupilot.git --recurse-submodules
-else
-  git clone -b $ARDUPILOT_RELEASE https://github.com/ArduPilot/ardupilot.git --recurse-submodules
-fi
+mkdir -p "/opt/ardupilot_dave" && cd "/opt/ardupilot_dave" || exit
+git clone -b $ARDUPILOT_RELEASE https://github.com/ArduPilot/ardupilot.git --recurse-submodules
 
 # Install ArduSub dependencies
 cd "/opt/ardupilot_dave/ardupilot" || exit
@@ -28,40 +22,18 @@ export DO_PYTHON_VENV_ENV=0
 Tools/environment_install/install-prereqs-ubuntu.sh -y
 
 # Build ArduSub
-cd "/opt/ardupilot_dave/ardupilot" || exit
-# needs python binary (e.g. sudo apt install python-is-python3)
-mkdir -p "/opt/ardupilot_dave/ardupilot/mktest" 2>/dev/null
-if [ $? -ne 0 ]; then
-  sudo modules/waf/waf-light configure --board sitl \
-    && sudo modules/waf/waf-light build --target bin/ardusub
-else
-  modules/waf/waf-light configure --board sitl \
-    && modules/waf/waf-light build --target bin/ardusub
-fi
+modules/waf/waf-light configure --board sitl \
+  && modules/waf/waf-light build --target bin/ardusub
 
 # Clone ardupilot_gazebo code
 cd "/opt/ardupilot_dave" || exit
-mkdir -p "/opt/ardupilot_dave/ardupilot_gazebo" 2>/dev/null
-if [ $? -ne 0 ]; then
-  cd "/opt/ardupilot_dave" || exit
-  sudo git clone https://github.com/ArduPilot/ardupilot_gazebo.git
-else
-  cd "/opt/ardupilot_dave" || exit
-  git clone https://github.com/ArduPilot/ardupilot_gazebo.git
-fi
+git clone https://github.com/ArduPilot/ardupilot_gazebo.git
 
 # Install ardupilot_gazebo plugin
 # Check if the directory creation was successful
-mkdir -p "/opt/ardupilot_dave/ardupilot_gazebo/build" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo "Insufficient privileges to create directory in /opt. Using sudo for cmake and make."
-  sudo mkdir -p "/opt/ardupilot_dave/ardupilot_gazebo/build" \
+mkdir -p "/opt/ardupilot_dave/ardupilot_gazebo/build" \
   && cd "/opt/ardupilot_dave/ardupilot_gazebo/build" || exit
-  sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make -j2
-else
-  cd "/opt/ardupilot_dave/ardupilot_gazebo/build" || exit
-  cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && make -j2
-fi
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && make -j2
 
 # Add results of ArduSub build
 export PATH=/opt/ardupilot_dave/ardupilot/build/sitl/bin:\$PATH
