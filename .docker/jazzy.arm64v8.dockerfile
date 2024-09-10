@@ -101,7 +101,7 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
     apt-get install -y --no-install-recommends \
     python-is-python3 python3-future python3-wxgtk4.0 python3-pexpect \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-    libgz-sim8-dev rapidjson-dev libopencv-dev \
+    libgz-sim8-dev rapidjson-dev libopencv-dev libasio-dev \
     gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
     && rm -rf /var/lib/apt/lists/
 # Install Ardupilot - Ardusub

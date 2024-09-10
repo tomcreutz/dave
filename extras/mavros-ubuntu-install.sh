@@ -20,6 +20,10 @@ export MAVLINK_RELEASE=release/rolling/mavlink
 mkdir -p "/opt/mavros/src" && cd "/opt/mavros" || exit
 vcs import --force --shallow --retry 0 \
         --input https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/extras/repos/mavros.jazzy.repos src
+
+# Install MAVROS dependencies
+apt update && apt install libasio-dev libtinyxml2-dev -y
+
 # Build
 MAKEFLAGS="-j2" ROS_PYTHON_VERSION=3 colcon build --cmake-args -DCMAKE_MODULE_PATH=/usr/local/share/cmake/GeographicLib:\$CMAKE_MODULE_PATH -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
 
