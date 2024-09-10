@@ -12,6 +12,9 @@ mkdir -p GeographicLib/BUILD && cd GeographicLib/BUILD || exit
 geographiclib-get-geoids egm96-5
 geographiclib-get-gravity egm96
 geographiclib-get-magnetic emm2015
+ln -s /usr/local/share/GeographicLib/geoids/egm96-5.pgm /usr/local/share/GeographicLib/egm96-5.pgm
+ln -s /usr/local/share/GeographicLib/gravity/egm96.egm /usr/local/share/GeographicLib/egm96.egm
+ln -s /usr/local/share/GeographicLib/magnetic/emm2015.wmm /usr/local/share/GeographicLib/emm2015.wmm
 export GEOGRAPHICLIB_GEOID_PATH=/usr/local/share/GeographicLib
 
 # Manually install MAVROS from source
