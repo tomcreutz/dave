@@ -154,6 +154,7 @@ USER docker
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
     echo "source /opt/gazebo/install/setup.bash" >> ~/.bashrc && \
     echo "source /opt/mavros/install/setup.bash" >> ~/.bashrc && \
+    echo "export GEOGRAPHICLIB_GEOID_PATH=/usr/local/share/GeographicLib/geoids" >> ~/.bashrc && \
     echo "export PYTHONPATH=\$PYTHONPATH:/opt/gazebo/install/lib/python" >> ~/.bashrc && \
     echo "export PATH=/opt/ardupilot_dave/ardupilot/build/sitl/bin:\$PATH" >> ~/.bashrc && \
     echo "export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:\$PATH" >> ~/.bashrc && \
