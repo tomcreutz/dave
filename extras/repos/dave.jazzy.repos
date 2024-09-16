@@ -13,3 +13,8 @@ repositories:
     type: git
     url: https://github.com/IOES-Lab/dave.git
     version: ros2
+
+  ardusub_driver:
+    type: git
+    url: https://github.com/Robotic-Decision-Making-Lab/ardusub_driver.git
+    version: main

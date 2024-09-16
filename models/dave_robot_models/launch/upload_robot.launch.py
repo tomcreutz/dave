@@ -106,7 +106,7 @@ def generate_launch_description():
         ],
         output="both",
         condition=IfCondition(use_ned_frame),
-        parameters=[{"use_sim_time_time": use_sim_time}],
+        parameters=[{"use_sim_time": use_sim_time}],
     )
 
     gz_spawner = Node(
@@ -132,13 +132,13 @@ def generate_launch_description():
         ],
         output="both",
         condition=IfCondition(gui),
-        parameters=[{"use_sim_time_time": use_sim_time}],
+        parameters=[{"use_sim_time": use_sim_time}],
     )
 
     nodes = [tf2_spawner, gz_spawner]
 
-    # Include ros_gz_bridge.py based on the model name
-    ros_gz_bridge = IncludeLaunchDescription(
+    # Include robot_config.py based on the model name
+    robot_config = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 PathJoinSubstitution(
@@ -146,7 +146,7 @@ def generate_launch_description():
                         FindPackageShare("dave_robot_models"),
                         "config",
                         namespace,
-                        "ros_gz_bridge.py",
+                        "robot_config.py",
                     ]
                 )
             ]
@@ -156,7 +156,7 @@ def generate_launch_description():
         }.items(),
     )
 
-    include = [ros_gz_bridge]
+    include = [robot_config]
 
     event_handlers = [
         RegisterEventHandler(

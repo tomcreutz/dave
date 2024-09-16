@@ -78,7 +78,7 @@
         <always_on>true</always_on>
         <update_rate>10</update_rate>
         <visualize>true</visualize>
-        <topic>/model/bluerov2/camera/image_raw</topic>
+        <topic>/model/bluerov2_heavy/camera/image_raw</topic>
       </sensor>
     </link>
 
