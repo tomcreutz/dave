@@ -104,34 +104,10 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
     libgz-sim8-dev rapidjson-dev libopencv-dev libasio-dev \
     gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
     && rm -rf /var/lib/apt/lists/
-# Install Ardupilot - Ardusub
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
-extras/ardusub-ubuntu-install-local.sh install.sh
-RUN bash install.sh
 # Install mavros
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
 extras/mavros-ubuntu-install.sh install.sh
 RUN bash install.sh
-
-# Set up Dave workspace
-ENV ROS_UNDERLAY=/home/$USER/dave_ws/install
-WORKDIR $ROS_UNDERLAY/../src
-
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
-extras/repos/dave.$ROS_DISTRO.repos /home/$USER/dave_ws/dave.repos
-RUN vcs import --shallow --input "/home/$USER/dave_ws/dave.repos"
-
-RUN rosdep init && \
-  rosdep update --rosdistro $ROS_DISTRO
-
-# hadolint ignore=DL3027
-RUN apt update && apt --fix-broken install && \
-    rosdep update && rosdep install -iy --from-paths . && \
-    rm -rf /var/lib/apt/lists/
-
-WORKDIR $ROS_UNDERLAY/..
-RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
-    colcon build
 
 # Download the background image from GitHub raw content URL
 # hadolint ignore=DL3047
@@ -145,15 +121,36 @@ extras/background.png && \
     cp /usr/share/backgrounds/warty-final-ubuntu.png \
         /usr/share/backgrounds/ubuntu-wallpaper-d.png
 
-# source entrypoint setup
-RUN touch /ros_entrypoint.sh && sed --in-place --expression \
-    '$i source "$ROS_UNDERLAY/setup.bash"' /ros_entrypoint.sh
+# Install Ardupilot - Ardusub
+USER docker
+RUN wget -O /tmp/install.sh https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/extras/ardusub-ubuntu-install-local.sh
+RUN chmod +x /tmp/install.sh && bash /tmp/install.sh
+
+# Set up Dave workspace
+ENV DAVE_UNDERLAY=/home/$USER/dave_ws
+WORKDIR $DAVE_UNDERLAY/src
+RUN wget -O /home/$USER/dave_ws/dave.repos -q https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
+extras/repos/dave.$ROS_DISTRO.repos
+RUN vcs import --shallow --input "/home/$USER/dave_ws/dave.repos"
+
+RUN sudo rosdep init && \
+    sudo rosdep update --rosdistro $ROS_DISTRO
+
+# hadolint ignore=DL3027
+RUN sudo apt update && sudo apt --fix-broken install && \
+    sudo rosdep install --rosdistro $ROS_DISTRO -iy --from-paths . && \
+    sudo rm -rf /var/lib/apt/lists/
+
+# Build dave workspace
+WORKDIR $DAVE_UNDERLAY
+RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && colcon build
 
 # Set User as user
 USER docker
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
     echo "source /opt/gazebo/install/setup.bash" >> ~/.bashrc && \
     echo "source /opt/mavros/install/setup.bash" >> ~/.bashrc && \
+    echo "source $DAVE_UNDERLAY/install/setup.bash" >> ~/.bashrc && \
     echo "export GEOGRAPHICLIB_GEOID_PATH=/usr/local/share/GeographicLib/geoids" >> ~/.bashrc && \
     echo "export PYTHONPATH=\$PYTHONPATH:/opt/gazebo/install/lib/python" >> ~/.bashrc && \
     echo "export PATH=/home/$USER/ardupilot_dave/ardupilot/build/sitl/bin:\$PATH" >> ~/.bashrc && \
