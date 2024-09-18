@@ -86,6 +86,8 @@ RUN touch /ros_entrypoint.sh && sed --in-place --expression \
     && sed --in-place --expression \
     '$i cd /root' /ros_entrypoint.sh
 
+RUN cp /home/docker/.bashrc ~/.bashrc
+
 # Source ROS and Gazebo
 RUN sed --in-place --expression \
 '$i source "/opt/ros/jazzy/setup.bash"' /ros_entrypoint.sh && \
@@ -106,7 +108,7 @@ sed --in-place --expression \
 sed --in-place --expression \
 '$i export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i printf '\''\033[1;37m =====\n'\'' ' /ros_entrypoint.sh && \
+'$i printf '\''\\033[1;37m \n=====\n'\'' ' /ros_entrypoint.sh && \
 sed --in-place --expression \
 '$i printf '\''  ____    ___     _______      _                     _   _      \n'\'' ' /ros_entrypoint.sh && \
 sed --in-place --expression \
@@ -126,10 +128,10 @@ sed --in-place --expression \
 sed --in-place --expression \
 '$i printf '\''   \\ V / | | |  | |_| |_| | (_| | |   | |___| | | \\ V /| | |_   \n'\'' ' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i printf '\''    \\_/  |_|_|   \\__|\\__,_|\\__,_|_|   |_____|_| |_|\\_/ |_|_(_)  \n\033[0m'\'' ' /ros_entrypoint.sh && \
+'$i printf '\''    \\_/  |_|_|   \\__|\\__,_|\\__,_|_|   |_____|_| |_|\\_/ |_|_(_)  \n\\033[0m'\'' ' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i printf '\''\033[1;32m\n =====\n\033[0m'\'' ' /ros_entrypoint.sh && \
+'$i printf '\''\\033[1;32m\n =====\\033[0m\n'\'' ' /ros_entrypoint.sh && \
 sed --in-place --expression \
 '$i printf '\''\\033[1;32m 👋 Hi! This is Docker virtual environment for DAVE\n\\033[0m'\'' ' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i printf '\''\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic (w ardupilot(ardusub) + mavros)\n\n\n\\033[0m'\'' ' /ros_entrypoint.sh
+'$i printf '\''\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic (w ardupilot(ardusub) + mavros)\n\n\\033[0m'\'' ' /ros_entrypoint.sh
