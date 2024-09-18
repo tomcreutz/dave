@@ -104,4 +104,32 @@ sed --in-place --expression \
 sed --in-place --expression \
 '$i export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:\$GZ_SIM_SYSTEM_PLUGIN_PATH' /ros_entrypoint.sh && \
 sed --in-place --expression \
-'$i export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH' /ros_entrypoint.sh
+'$i export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''\033[1;37m =====\n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''  ____    ___     _______      _                     _   _      \n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\'' |  _ \\  / \\ \\   / | ____|    / \\   __ _ _   _  __ _| |_(_) ___ \n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\'' | | | |/ _ \\ \\ / /|  _|     / _ \\ / _` | | | |/ _` | __| |/ __|\n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\'' | |_| / ___ \\ V / | |___   / ___ \\ (_| | |_| | (_| | |_| | (__ \n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\'' |____/_/   \\_\\_/  |_____| /_/   \\_\\__, |\\__,_|\\__,_|\\__|_|\\___|\n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\'' __     ___      _               _     _____            _       \n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\'' \\ \\   / (_)_ __| |_ _   _  __ _| |   | ____|_ ____   _(_)_ __  \n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''  \\ \\ / /| | `__| __| | | |/ _` | |   |  _| | `_ \\ \\ / | | `__| \n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''   \\ V / | | |  | |_| |_| | (_| | |   | |___| | | \\ V /| | |_   \n'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''    \\_/  |_|_|   \\__|\\__,_|\\__,_|_|   |_____|_| |_|\\_/ |_|_(_)  \n\033[0m'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''\033[1;32m\n =====\n\033[0m'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''\\033[1;32m 👋 Hi! This is Docker virtual environment for DAVE\n\\033[0m'\'' ' /ros_entrypoint.sh && \
+sed --in-place --expression \
+'$i printf '\''\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic (w ardupilot(ardusub) + mavros)\n\n\n\\033[0m'\'' ' /ros_entrypoint.sh
