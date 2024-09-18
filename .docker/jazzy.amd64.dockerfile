@@ -82,7 +82,9 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
 
 # source entrypoint setup
 RUN touch /ros_entrypoint.sh && sed --in-place --expression \
-    '$i source "/opt/dave_ws/install/setup.bash"' /ros_entrypoint.sh
+    '$i source "/opt/dave_ws/install/setup.bash"' /ros_entrypoint.sh \
+    && sed --in-place --expression \
+    '$i cd /root' /ros_entrypoint.sh
 
 # Source ROS and Gazebo
 RUN sed --in-place --expression \
