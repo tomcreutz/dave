@@ -106,7 +106,7 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
     && rm -rf /var/lib/apt/lists/
 # Install Ardupilot - Ardusub
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
-extras/ardusub-ubuntu-install.sh install.sh
+extras/ardusub-ubuntu-install-local.sh install.sh
 RUN bash install.sh
 # Install mavros
 ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
@@ -156,11 +156,11 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
     echo "source /opt/mavros/install/setup.bash" >> ~/.bashrc && \
     echo "export GEOGRAPHICLIB_GEOID_PATH=/usr/local/share/GeographicLib/geoids" >> ~/.bashrc && \
     echo "export PYTHONPATH=\$PYTHONPATH:/opt/gazebo/install/lib/python" >> ~/.bashrc && \
-    echo "export PATH=/opt/ardupilot_dave/ardupilot/build/sitl/bin:\$PATH" >> ~/.bashrc && \
-    echo "export PATH=/opt/ardupilot_dave/ardupilot/Tools/autotest:\$PATH" >> ~/.bashrc && \
-    echo "export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_dave/ardupilot_gazebo/build:\$GZ_SIM_SYSTEM_PLUGIN_PATH" >> ~/.bashrc && \
-    echo "export GZ_SIM_RESOURCE_PATH=/opt/ardupilot_dave/ardupilot_gazebo/models:/opt/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH" >> ~/.bashrc && \&& \
-    echo "\n\n" >> ~/.bashrc && echo "if [ -d ~/HOST ]; then chown docker:docker ~/HOST; fi" >> ~/.bashrc  && \
+    echo "export PATH=/home/$USER/ardupilot_dave/ardupilot/build/sitl/bin:\$PATH" >> ~/.bashrc && \
+    echo "export PATH=/home/$USER/ardupilot_dave/ardupilot/Tools/autotest:\$PATH" >> ~/.bashrc && \
+    echo "export GZ_SIM_SYSTEM_PLUGIN_PATH=/home/$USER/ardupilot_dave/ardupilot_gazebo/build:\$GZ_SIM_SYSTEM_PLUGIN_PATH" >> ~/.bashrc && \
+    echo "export GZ_SIM_RESOURCE_PATH=/home/$USER/ardupilot_dave/ardupilot_gazebo/models:/home/$USER/ardupilot_dave/ardupilot_gazebo/worlds:\$GZ_SIM_RESOURCE_PATH" >> ~/.bashrc && \&& \
+    echo "\n\n" >> ~/.bashrc && echo "if [ -d ~/HOST ]; then chown $USER:$USER ~/HOST; fi" >> ~/.bashrc  && \
     echo "\n\n" >> ~/.bashrc
 
 # Other environment variables

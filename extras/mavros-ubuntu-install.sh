@@ -22,7 +22,9 @@ vcs import --force --shallow --retry 0 \
         --input https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/extras/repos/mavros.jazzy.repos src
 
 # Install MAVROS dependencies
-apt update && apt install libasio-dev libtinyxml2-dev -y
+apt update && apt install -y libasio-dev libtinyxml2-dev python3-dev \
+    python3-opencv python3-wxgtk4.0 python3-pip python3-matplotlib python3-lxml python3-pygame
+pip3 install PyYAML mavproxy --break-system-packages
 
 # Build
 MAKEFLAGS="-j2" ROS_PYTHON_VERSION=3 colcon build --cmake-args -DCMAKE_MODULE_PATH=/usr/local/share/cmake/GeographicLib:\$CMAKE_MODULE_PATH -Wno-dev -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
