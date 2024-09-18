@@ -164,13 +164,24 @@ RUN echo "export XDG_RUNTIME_DIR=~/.xdg_log" >> ~/.bashrc && \
 
 # Create and write the welcome message to a new file
 RUN mkdir -p /home/docker/.config/autostart && \
+    printf '\033[1;37m =====\n' >> ~/.hi && \
+    printf '  ____    ___     _______      _                     _   _      \n' >> ~/.hi && \
+    printf ' |  _ \  / \ \   / | ____|    / \   __ _ _   _  __ _| |_(_) ___ \n' >> ~/.hi && \
+    printf ' | | | |/ _ \ \ / /|  _|     / _ \ / _` | | | |/ _` | __| |/ __|\n' >> ~/.hi && \
+    printf ' | |_| / ___ \ V / | |___   / ___ | (_| | |_| | (_| | |_| | (__ \n' >> ~/.hi && \
+    printf ' |____/_/   \_\_/  |_____| /_/   \_\__, |\__,_|\__,_|\__|_|\___|\n' >> ~/.hi && \
+    printf ' __     ___      _               _     _____            _       \n' >> ~/.hi && \
+    printf ' \ \   / (_)_ __| |_ _   _  __ _| |   | ____|_ ____   _(_)_ __  \n' >> ~/.hi && \
+    printf '  \ \ / /| | `__| __| | | |/ _` | |   |  _| | `_ \ \ / | | `__| \n' >> ~/.hi && \
+    printf '   \ V / | | |  | |_| |_| | (_| | |   | |___| | | \ V /| | |_   \n' >> ~/.hi && \
+    printf '    \_/  |_|_|   \__|\__,_|\__,_|_|   |_____|_| |_|\_/ |_|_(_)  \n\033[0m' >> ~/.hi && \
     printf '\033[1;32m\n =====\n\033[0m' >> ~/.hi && \
-    printf "\\033[1;32m 👋 Hi! This is Docker virtual environment\n\\033[0m" \
+    printf "\\033[1;32m 👋 Hi! This is Docker virtual environment for DAVE\n\\033[0m" \
     >> ~/.hi && \
-    printf "\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic (w ardusub)\n\n\n\\033[0m" \
+    printf "\\033[1;33m\tROS2 Jazzy - Gazebo Harmonic (w ardupilot(ardusub) + mavros)\n\n\n\\033[0m" \
     >> ~/.hi
 
-# Remove sudo message
+    # Remove sudo message
 RUN touch /home/docker/.sudo_as_admin_successful
 
 # Autostart terminal
