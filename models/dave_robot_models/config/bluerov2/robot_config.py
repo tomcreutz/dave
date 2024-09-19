@@ -66,29 +66,29 @@ def launch_setup(context, *args, **kwargs):
 
     processes = [ardusub_process]
 
-    ardusub_manager_file = LaunchConfiguration("ardusub_manager_file")
+    # ardusub_manager_file = LaunchConfiguration("ardusub_manager_file")
 
-    # Include the ardusub_manager launch file
-    ardusub_manager = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [
-                PathJoinSubstitution(
-                    [
-                        FindPackageShare("ardusub_manager"),
-                        "launch",
-                        "ardusub_manager.launch.py",
-                    ]
-                )
-            ]
-        ),
-        launch_arguments={
-            "ardusub_manager_file": ardusub_manager_file,
-        }.items(),
-    )
+    # # Include the ardusub_manager launch file
+    # ardusub_manager = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         [
+    #             PathJoinSubstitution(
+    #                 [
+    #                     FindPackageShare("ardusub_manager"),
+    #                     "launch",
+    #                     "ardusub_manager.launch.py",
+    #                 ]
+    #             )
+    #         ]
+    #     ),
+    #     launch_arguments={
+    #         "ardusub_manager_file": ardusub_manager_file,
+    #     }.items(),
+    # )
 
-    includes = [ardusub_manager]
+    # includes = [ardusub_manager]
 
-    return nodes + processes + includes
+    return nodes + processes
 
 
 def generate_launch_description():
