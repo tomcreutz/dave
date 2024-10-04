@@ -57,7 +57,7 @@ def launch_setup(context, *args, **kwargs):
     ardusub_params = LaunchConfiguration("ardusub_params").perform(context)
 
     ardusub_cmd = [
-        "ardusub -S -w -M JSON --defaults "
+        "ardusub -S -w -M gazebo --defaults "
         + ardusub_params
         + " -IO --home 44.65870,-124.06556,0.0,270.0"
     ]
