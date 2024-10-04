@@ -31,7 +31,7 @@ def launch_setup(context, *args, **kwargs):
             f"/model/{namespace}/pose@geometry_msgs/msg/PoseArray@gz.msgs.Pose_V",
             f"/model/{namespace}/imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
             f"/model/{namespace}/magnetometer@sensor_msgs/msg/MagneticField@gz.msgs.Magnetometer",
-            f"/model/{namespace}/camera/image_raw@sensor_msgs/msg/Image@gz.msgs.Image",
+            f"/model/{namespace}/camera/image@sensor_msgs/msg/Image@gz.msgs.Image",
             f"/model/{namespace}/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo",
         ]
     )
