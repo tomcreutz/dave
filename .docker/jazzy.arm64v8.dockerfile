@@ -105,7 +105,7 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
     gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
     && rm -rf /var/lib/apt/lists/
 # Install mavros
-ADD https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/\
+ADD https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/\
 extras/mavros-ubuntu-install.sh install.sh
 RUN bash install.sh
 
@@ -123,7 +123,7 @@ extras/background.png && \
 
 # Install Ardupilot - Ardusub
 USER docker
-RUN wget -O /tmp/install.sh https://raw.githubusercontent.com/IOES-Lab/dave/ardusub_install/extras/ardusub-ubuntu-install-local.sh
+RUN wget -O /tmp/install.sh https://raw.githubusercontent.com/IOES-Lab/dave/$BRANCH/extras/ardusub-ubuntu-install-local.sh
 RUN chmod +x /tmp/install.sh && bash /tmp/install.sh
 
 # Set up Dave workspace
