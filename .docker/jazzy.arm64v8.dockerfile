@@ -133,11 +133,13 @@ RUN wget -O /home/$USER/dave_ws/dave.repos -q https://raw.githubusercontent.com/
 extras/repos/dave.$ROS_DISTRO.repos
 RUN vcs import --shallow --input "/home/$USER/dave_ws/dave.repos"
 
+USER root
 # hadolint ignore=DL3027
 RUN apt update && apt --fix-broken install && \
     rosdep init && rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install --rosdistro $ROS_DISTRO -iy --from-paths . && \
     rm -rf /var/lib/apt/lists/
+USER docker
 
 # Build dave workspace
 WORKDIR $DAVE_UNDERLAY
