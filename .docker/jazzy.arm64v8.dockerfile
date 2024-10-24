@@ -134,10 +134,10 @@ extras/repos/dave.$ROS_DISTRO.repos
 RUN vcs import --shallow --input "/home/$USER/dave_ws/dave.repos"
 
 # hadolint ignore=DL3027
-RUN sudo apt update && sudo apt --fix-broken install && \
-    sudo rosdep init && rosdep update --rosdistro $ROS_DISTRO && \
+RUN apt update && apt --fix-broken install && \
+    rosdep init && rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install --rosdistro $ROS_DISTRO -iy --from-paths . && \
-    sudo rm -rf /var/lib/apt/lists/
+    rm -rf /var/lib/apt/lists/
 
 # Build dave workspace
 WORKDIR $DAVE_UNDERLAY
