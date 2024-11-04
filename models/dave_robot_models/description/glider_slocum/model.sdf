@@ -206,10 +206,10 @@
       <mQ>-20</mQ>
       <nR>-32</nR>
       <!-- cross terms -->
-      <yR>150</yR>
+      <!-- <yR>150</yR>
       <zQ>-100</zQ>
       <mW>37</mW>
-      <nV>-34</nV>
+      <nV>-34</nV> -->
 
       <!-- Quadratic Drag Coefficients -->
       <xUabsU>0</xUabsU>
